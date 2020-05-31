@@ -1,4 +1,4 @@
-<h1 style="text-align:center;">Rádiologo</h1>
+<h1 style="text-align:center;">Radiólogo</h1>
 
 Built with ***Vue.js*** and ***Django***
 
@@ -11,6 +11,12 @@ A web app supporting:
 * management and registration of users and programs
 
 ## Installation
+
+Install all the required packages in the backend:
+
+```
+cd backend && pipenv install
+```
 
 
 
