@@ -1,0 +1,19 @@
+[Servers]
+UploadServer.ip = ""
+UploadServer.username = ""
+UploadServer.password = ""
+UploadServer.rootUploadDirectory = ""
+
+ArchiveServer.ip = ""
+ArchiveServer.username = ""
+ArchiveServer.password = ""
+ArchiveServer.rootUploadDirectory = ""
+
+[AppSettings]
+SecretKey = "pkj9vrft%5p*)27@3x2b1vi3h42k%e1#6sq+d994&z5y+b7mym"
+Debug = True
+LanguageCode = "en-us"
+TimeZone = "UTC"
+UseI18N = True
+UseL10N = True
+UseTZ = True
