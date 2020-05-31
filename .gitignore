@@ -131,3 +131,4 @@ dmypy.json
 # Settings
 application.properties
 /backend/Pipfile
+.idea/
