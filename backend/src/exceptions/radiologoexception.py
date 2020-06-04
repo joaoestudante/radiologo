@@ -1,0 +1,2 @@
+class RadiologoException(Exception):
+    pass
