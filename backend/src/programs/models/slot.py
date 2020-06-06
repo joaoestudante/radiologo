@@ -64,7 +64,7 @@ allowed_slots = ("00:03",
                  "23:32")
 
 
-def slot_wraps(start_index, slots_occupied):
+def slot_wraps(start_index: int, slots_occupied: int) -> bool:
     return start_index + slots_occupied >= len(allowed_slots)
 
 
@@ -83,15 +83,7 @@ class Slot(models.Model):
         return self.get_weekday_display() + ", " + self.time.strftime("%H:%M") + " - (" + str(self.program) + ")"
 
     @staticmethod
-    def iso_to_custom_format(iso):
-        """
-        ISO |  custom
-        1   |  2     (monday)
-        2   |  3     (tuesday)
-           ...
-        6   |  7     (saturday)
-        7   |  1     (sunday)
-        """
+    def iso_to_custom_format(iso: int):
         return iso % 7 + 1
 
     @staticmethod
@@ -134,7 +126,6 @@ class Slot(models.Model):
 
         else:
             return allowed_slots[start_index:end_index]
-
 
     def internal_slots_occupied(self):
         return self.slots_occupied(self.program.max_duration, self.time)
