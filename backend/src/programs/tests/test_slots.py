@@ -10,11 +10,11 @@ class SlotTest(TestCase):
     def setUp(self):
         self.slot_service = SlotService()
 
-        self.program_28 = Program(pk=1, name="Program1", max_duration=28)
+        self.program_28 = Program(pk=1, name="Program28", max_duration=28)
         self.program_28.save()
-        self.program_57 = Program(pk=2, name="Program2", max_duration=57)
+        self.program_57 = Program(pk=2, name="Program57", max_duration=57)
         self.program_57.save()
-        self.program_117 = Program(pk=3, name="Program3", max_duration=117)
+        self.program_117 = Program(pk=3, name="Program117", max_duration=117)
         self.program_117.save()
 
     def test_creation(self):
