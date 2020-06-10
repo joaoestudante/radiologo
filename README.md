@@ -13,7 +13,7 @@ A web app supporting:
 
 ## Requirements
 ```
-python 3.7.5
+python 3.8
 Redis
 sqlite3
 ffmpeg

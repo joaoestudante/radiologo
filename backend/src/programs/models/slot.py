@@ -86,6 +86,21 @@ class Slot(models.Model):
     def iso_to_custom_format(iso: int):
         return iso % 7 + 1
 
+    @property
+    def iso_weekday(self):
+        """
+        1 -> 7
+        2 -> 1
+        3 -> 2
+        4 -> 3
+        5 -> 4
+        6 -> 5
+        7 -> 6
+        """
+        return [7, 1, 2, 3, 4, 5, 6][int(self.weekday) - 1]
+
+
+
     @staticmethod
     def next_available(duration: int, time: datetime.time) -> str:
         current_index = allowed_slots.index(time.strftime("%H:%M"))

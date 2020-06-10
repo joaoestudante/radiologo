@@ -1,8 +1,10 @@
+from functools import cached_property
+
 from django.db import models
 from django.contrib.auth import get_user_model
 from django.utils import timezone
 from unidecode import unidecode
-
+from datetime import datetime, timedelta, date
 
 DURATIONS = (
     (28, '28'),
@@ -38,3 +40,29 @@ class Program(models.Model):
 
     def normalized_name(self):
         return unidecode(''.join(c for c in self.name if c.isalnum()).lower())
+
+    @cached_property
+    def disabled_days(self) -> tuple:
+        # Return non-intersecting elements
+        return tuple(set(self.enabled_days).symmetric_difference({1, 2, 3, 4, 5, 6, 7}))
+
+    @cached_property
+    def enabled_days(self) -> tuple:
+        return tuple([slot.iso_weekday for slot in self.slot_set.all().order_by('weekday')])
+
+    @cached_property
+    def occupied_slots(self) -> dict:
+        result = {}
+        for slot in self.slot_set.all():
+            result[slot.iso_weekday] = slot.internal_slots_occupied()
+        return result
+
+    def next_emission_date(self) -> str:
+        current_day = date.today()
+        current_iso_weekday = current_day.isoweekday()
+        if current_iso_weekday in self.enabled_days:
+            return current_day.isoformat()
+        else:
+            for i in range(1,7):
+                if (current_day + timedelta(days=i)).isoweekday() in self.enabled_days:
+                    return (current_day + timedelta(days=i)).isoformat()

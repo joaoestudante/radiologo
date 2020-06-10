@@ -22,6 +22,7 @@ class SlotTest(TestCase):
         slot = self.slot_service.create_slot(iso_weekday=1, time=datetime.strptime("00:03", "%H:%M"),
                                              program_object=self.program_28)
         self.assertEqual(2, slot.weekday)
+        self.assertEqual(1, slot.iso_weekday)
         self.assertEqual(0, slot.time.hour)
         self.assertEqual(3, slot.time.minute)
         self.assertEqual(self.program_28, slot.program)
