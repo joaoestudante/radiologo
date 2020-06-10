@@ -53,3 +53,15 @@ class SlotService:
                         time.strftime("%H:%M"),
                         slot.program.name,
                         slot.time.strftime("%H:%M")))
+
+    def occupied_slots_in_day(self, iso_weekday) -> tuple:
+        total_times = []
+        for slot in Slot.objects.filter(weekday=Slot.iso_to_custom_format(iso_weekday)):
+            total_times.extend(slot.internal_slots_occupied())
+        return tuple(total_times)
+
+    def occupied_slots_in_week(self) -> dict:
+        result = {}
+        for i in range(1, 8):
+            result[i] = self.occupied_slots_in_day(i)
+        return result
