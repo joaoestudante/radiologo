@@ -11,9 +11,6 @@ class SlotService:
         pass
 
     def create_slot(self, iso_weekday: int, time: datetime.time, program_object: Program):
-        # TODO: Program should be created here based on the serialized version,
-        # since it only makes sense to create the program if the slot was successfully
-        # created
         self.check_occupied_slot(iso_weekday, time)
         self.check_next_slots(iso_weekday, time, program_object)
         self.check_prev_slots(iso_weekday, time, program_object)

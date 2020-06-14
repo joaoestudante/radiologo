@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from datetime import datetime
+from .program import Program
 
 # This is our own format - it is not a standard
 # Monday[EN] = Segunda[PT] = "Second"[EN] = 2
@@ -71,7 +72,7 @@ def slot_wraps(start_index: int, slots_occupied: int) -> bool:
 class Slot(models.Model):
     weekday = models.CharField(max_length=15, choices=WEEKDAYS)
     time = models.TimeField()
-    program = models.ForeignKey('Program', on_delete=models.CASCADE)
+    program = models.ForeignKey(to=Program, on_delete=models.CASCADE)
 
     def __init__(self, *args, **kwargs):
         if (kwargs):
