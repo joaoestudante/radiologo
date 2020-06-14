@@ -13,7 +13,7 @@ class ListCreateProgramsView(APIView):
     def get(self, request):
         programs = [program for program in Program.objects.all()]
         serialized = ProgramSerializer(programs, many=True)
-        return Response(serialized.data)
+        return Response(serialized.data, status=status.HTTP_200_OK)
 
     def post(self, request, *args, **kwargs):
         serialized = ProgramSerializer(data=request.data)
@@ -27,14 +27,14 @@ class GetUpdateDeleteProgramView(APIView):
 
     def get(self, request, pk):
         program = Program.objects.get(pk=pk)
-        serialized = ProgramSerializer(program, data=request.data)
+        serialized = ProgramSerializer(program)
         return Response(serialized.data, status=status.HTTP_200_OK)
 
     def patch(self, request, pk):
         program = Program.objects.get(pk=pk)
         serialized = ProgramSerializer(program, data=request.data, partial=True)
-        if serialized.is_valid():
-            serialized.save()
+        serialized.is_valid(raise_exception=True)
+        serialized.save()
         return Response(serialized.data, status=status.HTTP_201_CREATED)
 
     def delete(self, request, pk):

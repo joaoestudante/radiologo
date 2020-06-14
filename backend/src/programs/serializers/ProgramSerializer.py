@@ -6,6 +6,7 @@ from ..services.SlotService import SlotService
 from users.serializers.UserSerializer import UserSerializer
 from exceptions.radiologoexception import RadiologoException
 from django.contrib.auth import get_user_model
+from django.db import transaction
 
 
 class ProgramSerializer(serializers.ModelSerializer):
@@ -17,19 +18,45 @@ class ProgramSerializer(serializers.ModelSerializer):
         fields = ['name', 'description', 'max_duration', 'first_emission_date', 'comes_normalized',
                   'ignore_duration_adjustment', 'is_external', 'state', 'slot_set', 'authors']
 
+    @transaction.atomic
     def create(self, validated_data):
         slots_data = validated_data.pop('slot_set')
         authors_data = validated_data.pop('authors')
         created_program = ProgramService().create_program(authors_data, **validated_data)
-        created_slots = []
-        for slot in slots_data:
-            try:
-                dict_slot = dict(slot)
-                SlotService().create_slot(int(dict_slot['iso_weekday']), dict_slot['time'], created_program)
-            except Exception as e:
-                created_program.delete()
-                for created_slot in created_slots:
-                    created_slot.delete()
-                raise(e)
-
+        self.create_slots_from_data(slots_data, created_program)
         return created_program
+
+    @transaction.atomic
+    def update(self, instance, validated_data):
+        if "slot_set" in validated_data:
+            slots_data = validated_data.pop('slot_set')
+            previous_slots = instance.slot_set.all()
+            previous_slots.delete()
+            self.create_slots_from_data(slots_data, instance)
+
+        if "authors" in validated_data:
+            authors = validated_data.pop('authors')
+            instance.authors.set(authors)
+
+        self.update_other_instance_fields(instance, validated_data)
+
+        return instance
+
+    @staticmethod
+    def update_other_instance_fields(instance, validated_data):
+        instance.name = validated_data.get('name', instance.name)
+        instance.description = validated_data.get('description', instance.description)
+        instance.max_duration = validated_data.get('max_duration', instance.max_duration)
+        instance.first_emission_date = validated_data.get('first_emission_date', instance.first_emission_date)
+        instance.comes_normalized = validated_data.get('comes_normalized', instance.comes_normalized)
+        instance.ignore_duration_adjustment = validated_data.get('ignore_duration_adjustment',
+                                                                 instance.ignore_duration_adjustment)
+        instance.is_external = validated_data.get('is_external', instance.is_external)
+        instance.state = validated_data.get('state', instance.state)
+
+    @staticmethod
+    def create_slots_from_data(slots_data, created_program):
+        for slot in slots_data:
+            dict_slot = dict(slot)
+            SlotService().create_slot(int(dict_slot['iso_weekday']), dict_slot['time'],
+                                      created_program)
