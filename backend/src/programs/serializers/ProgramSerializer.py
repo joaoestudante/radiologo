@@ -39,7 +39,8 @@ class ProgramSerializer(serializers.ModelSerializer):
             instance.authors.set(authors)
 
         self.update_other_instance_fields(instance, validated_data)
-
+        instance.save()
+        
         return instance
 
     @staticmethod
