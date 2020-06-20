@@ -32,12 +32,14 @@ class ProgramTest(TestCase):
         ist_2 = "N"
         phone_2 = "123456780"
 
-        self.author_1 = self.user_service.create_user(email_1, password, author_name_1, full_name_1, id_type,
-                                                      id_number_1,
-                                                      ist_1, phone_1)
-        self.author_2 = self.user_service.create_user(email_2, password, author_name_2, full_name_2, id_type,
-                                                      id_number_2,
-                                                      ist_2, phone_2)
+        self.author_1 = self.user_service.create_user(email=email_1, password=password, author_name=author_name_1,
+                                                      full_name=full_name_1, id_type=id_type,
+                                                      id_number=id_number_1,
+                                                      ist_student_options=ist_1, phone=phone_1)
+        self.author_2 = self.user_service.create_user(email=email_2, password=password, author_name=author_name_2,
+                                                      full_name=full_name_2, id_type=id_type,
+                                                      id_number=id_number_2,
+                                                      ist_student_options=ist_2, phone=phone_2)
 
         self.program_1_name = "AAA"
         self.program_2_name = "BBB"
