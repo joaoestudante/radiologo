@@ -1,0 +1,5 @@
+Olá! Bem vindo à Rádio Zero!
+Para concluíres o teu registo na nossa plataforma e criares a tua password, clica neste link: {{ REGISTER_LINK }}
+
+Esperamos ver-te em breve,
+Rádio Zero
