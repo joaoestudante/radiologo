@@ -1,17 +1,25 @@
+from django.db import transaction
+
 from ..managers import CustomUserManager
 from ..models import CustomUser
+from ..models.invite import Invite
 
 
 class UserService:
     def __init__(self):
         self.user_manager = CustomUserManager()
 
+    @transaction.atomic
     def create_user(self, **data):
         if data.get('is_superuser', False):
             u = CustomUser.objects.create_superuser(**data)
         else:
             u = CustomUser.objects.create_user(**data)
         u.save()
+        if u.is_active:
+            invite = Invite(invited_user=u)
+            invite.save()
+            invite.send()
         return u
 
     def create_superuser(self, **data):
