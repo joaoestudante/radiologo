@@ -25,6 +25,7 @@ class UserSerializer(serializers.ModelSerializer):
                   'date_joined',
                   'exit_date',
                   'is_active',
+                  'is_registered',
                   'program_set']
 
     @transaction.atomic

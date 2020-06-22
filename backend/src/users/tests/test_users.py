@@ -16,12 +16,6 @@ class UsersManagersTests(TestCase):
             self.assertIsNone(user.username)
         except AttributeError:
             pass
-        with self.assertRaises(TypeError):
-            UserService().create_user()
-        with self.assertRaises(TypeError):
-            UserService().create_user(email='')
-        with self.assertRaises(ValueError):
-            UserService().create_user(email='', password='foo')
 
     def test_create_superuser(self):
         admin_user = UserService().create_superuser(email='super@user.com', password='foo')

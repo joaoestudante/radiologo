@@ -61,6 +61,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     date_joined = models.DateTimeField(default=timezone.now)
     exit_date = models.DateField(verbose_name=_("Exit Date"), default=None, null=True, blank=True)
     is_active = models.BooleanField(default=True)
+    is_registered = models.BooleanField(default=False)
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ["author_name", "full_name", "id_type", "id_number", "ist_student_options", "phone", "state",
