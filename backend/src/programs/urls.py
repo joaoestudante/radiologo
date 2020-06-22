@@ -3,5 +3,5 @@ from .views.ProgramView import ListCreateProgramsView, GetUpdateDeleteProgramVie
 
 urlpatterns = [
     path('', ListCreateProgramsView.as_view()),
-    path('<int:pk>/', GetUpdateDeleteProgramView.as_view())
+    path('<int:pk>/', GetUpdateDeleteProgramView.as_view(), name='programdetail')
 ]
