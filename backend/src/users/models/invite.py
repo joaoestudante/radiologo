@@ -17,8 +17,8 @@ class Invite(models.Model):
     accepted = models.BooleanField(default=False)
     last_date_sent = models.DateTimeField(default=timezone.now)
 
-    def invited_user_name(self):
-        return self.invited_user.full_name
+    def invited_user_author_name(self):
+        return self.invited_user.author_name
 
     def generate_token(self):
         # Inspired by: https://github.com/aaugustin/django-sesame/
