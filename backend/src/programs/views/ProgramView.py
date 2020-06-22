@@ -8,8 +8,6 @@ from django.shortcuts import get_object_or_404
 
 
 class ListCreateProgramsView(APIView):
-    authentication_classes = []
-    permission_classes = []
 
     def get(self, request):
         programs = [program for program in Program.objects.all()]
@@ -24,8 +22,6 @@ class ListCreateProgramsView(APIView):
 
 
 class GetUpdateDeleteProgramView(APIView):
-    authentication_classes = []
-    permission_classes = []
 
     def get(self, request, pk):
         program = get_object_or_404(Program, pk=pk)

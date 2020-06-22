@@ -7,8 +7,6 @@ from ..models.user import CustomUser
 
 
 class ListCreateUsersView(APIView):
-    authentication_classes = []
-    permission_classes = []
 
     def get(self, request):
         users = [user for user in CustomUser.objects.all()]
@@ -23,8 +21,6 @@ class ListCreateUsersView(APIView):
 
 
 class GetUpdateDeleteUserView(APIView):
-    authentication_classes = []
-    permission_classes = []
 
     def get(self, request, pk):
         user = CustomUser.objects.get(pk=pk)

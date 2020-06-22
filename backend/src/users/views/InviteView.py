@@ -62,9 +62,6 @@ class InviteAcceptView(APIView):
 
 class InviteListView(generics.ListAPIView):
     serializer_class = InviteSerializer
-    permission_classes = ()
-    authentication_classes = []
-
     queryset = Invite.objects.all()
 
 class InviteResendView(APIView):
