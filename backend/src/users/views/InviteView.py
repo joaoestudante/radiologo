@@ -8,13 +8,14 @@ from django.core import signing
 from django.core.signing import BadSignature
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
-from rest_framework import status
+from rest_framework import status, generics
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from exceptions.radiologoexception import BadInviteTokenException, InvalidTokenException, ExpiredTokenException, \
     InviteAlreadyAcceptedException
 from users.models import Invite
+from users.serializers.InviteSerializer import InviteSerializer
 
 
 class InviteAcceptView(APIView):
@@ -57,3 +58,20 @@ class InviteAcceptView(APIView):
     def check_accepted(self, invite):
         if invite.accepted:
             raise InviteAlreadyAcceptedException
+
+
+class InviteListView(generics.ListAPIView):
+    serializer_class = InviteSerializer
+    permission_classes = ()
+    authentication_classes = []
+
+    queryset = Invite.objects.all()
+
+class InviteResendView(APIView):
+
+    def post(self, request):
+        user = get_user_model().objects.get(author_name=request.data["invited_user_author_name"])
+        invite = Invite.objects.get(invited_user=user)
+        invite.send()
+
+        return Response(InviteSerializer(instance=invite).data, status=status.HTTP_200_OK)
