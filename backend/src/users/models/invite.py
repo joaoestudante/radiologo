@@ -42,3 +42,9 @@ class Invite(models.Model):
         self.sent_token = token
         self.last_date_sent = timezone.now()
         self.save()
+
+    @staticmethod
+    def get_pk_from_token(token):
+        data = signing.TimestampSigner(salt="radiologo").unsign(token)
+        decoded = signing.b64_decode(data.encode())
+        return (struct.unpack(str("!i"), decoded[:4])[0], decoded[4:])[0]
