@@ -19,6 +19,7 @@ from users.serializers.InviteSerializer import InviteSerializer
 
 
 class InviteAcceptView(APIView):
+    permission_classes = []
 
     def post(self, request, *args, **kwargs):
         url_token = kwargs["token"]

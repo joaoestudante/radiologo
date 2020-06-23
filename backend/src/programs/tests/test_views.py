@@ -6,11 +6,13 @@ from rest_framework import status
 from rest_framework.exceptions import ErrorDetail
 from rest_framework.test import APIClient
 from django.contrib.auth import get_user_model
+from rest_framework_simplejwt.tokens import RefreshToken
 
 from programs.models import Program, Slot
 from programs.serializers import ProgramSerializer
 from programs.services.ProgramService import ProgramService
 from programs.services.SlotService import SlotService
+from users.models import CustomUser
 from users.services.UserService import UserService
 
 
@@ -28,8 +30,20 @@ class ListCreateProgramsTest(TestCase):
         slot_service.create_slot(2, midnight, p2)
         slot_service.create_slot(3, midnight, p3)
 
+        logged_in_user = CustomUser(email="logged@in.com",
+                                    password="password",
+                                    author_name="aaa",
+                                    full_name="aaaa", id_type="CC",
+                                    id_number="123",
+                                    ist_student_options="Y", phone="1234")
+        logged_in_user.save()
+        token = RefreshToken.for_user(logged_in_user).access_token
+        self.auth_headers = {
+            'HTTP_AUTHORIZATION': 'Bearer ' + str(token)
+        }
+
     def test_listing(self):
-        response = self.client.get("/programs/", format='json')
+        response = self.client.get("/programs/", format='json', **self.auth_headers)
         programs = Program.objects.all()
         serialized_programs = ProgramSerializer(programs, many=True)
         self.assertEqual(response.data, serialized_programs.data)
@@ -47,7 +61,7 @@ class ListCreateProgramsTest(TestCase):
             ],
             "authors": []
         }),
-                                    content_type='application/json')
+                                    content_type='application/json', **self.auth_headers)
 
         self.assertEqual(Program.objects.count(), 4)
         serialized_p4 = ProgramSerializer(Program.objects.get(name="P4"))
@@ -66,7 +80,7 @@ class ListCreateProgramsTest(TestCase):
             ],
             "authors": []
         }),
-                                    content_type='application/json')
+                                    content_type='application/json', **self.auth_headers)
         self.assertEqual(Program.objects.count(), 3)
         self.assertEqual(Slot.objects.count(), 3)
         # Also assert exception error
@@ -84,7 +98,7 @@ class ListCreateProgramsTest(TestCase):
             "authors": []
         }),
 
-                                    content_type='application/json')
+                                    content_type='application/json', **self.auth_headers)
         self.assertEqual(Program.objects.count(), 3)
         self.assertEqual(Slot.objects.count(), 3)
 
@@ -101,7 +115,7 @@ class ListCreateProgramsTest(TestCase):
             "authors": []
         }),
 
-                                    content_type='application/json')
+                                    content_type='application/json', **self.auth_headers)
         self.assertEqual(Program.objects.count(), 3)
         self.assertEqual(Slot.objects.count(), 3)
 
@@ -126,16 +140,27 @@ class GetUpdateDeleteProgramsTest(TestCase):
                                                       full_name="AA1", id_type="CC",
                                                       id_number="123456789",
                                                       ist_student_options="Y", phone="999999999")
+        logged_in_user = CustomUser(email="logged@in.com",
+                                    password="password",
+                                    author_name="aaa",
+                                    full_name="aaaa", id_type="CC",
+                                    id_number="123",
+                                    ist_student_options="Y", phone="1234")
+        logged_in_user.save()
+        token = RefreshToken.for_user(logged_in_user).access_token
+        self.auth_headers = {
+            'HTTP_AUTHORIZATION': 'Bearer ' + str(token)
+        }
 
 
     def test_existing_program(self):
-        response = self.client.get("/programs/1/", format='json')
+        response = self.client.get("/programs/1/", format='json', **self.auth_headers)
         serialized_program = ProgramSerializer(self.p1)
         self.assertEqual(response.data, serialized_program.data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_non_existing_program(self):
-        response = self.client.get("/programs/99/", format='json')
+        response = self.client.get("/programs/99/", format='json', **self.auth_headers)
         self.assertEqual(response.data, {'detail': ErrorDetail(string='Not found.', code='not_found')})
 
     def test_update_program(self):
@@ -148,7 +173,7 @@ class GetUpdateDeleteProgramsTest(TestCase):
             "authors": [
                 1
             ]
-        }), content_type='application/json')
+        }), content_type='application/json', **self.auth_headers)
 
         program = Program.objects.get(pk=1)
         author = get_user_model().objects.get(pk=1)
@@ -160,7 +185,7 @@ class GetUpdateDeleteProgramsTest(TestCase):
         self.assertEqual(list(author.program_set.all()), [program])
 
     def test_delete_program(self):
-        response = self.client.delete("/programs/1/")
+        response = self.client.delete("/programs/1/", **self.auth_headers)
         self.assertEqual(Program.objects.count(), 2)
         self.assertEqual(Slot.objects.count(), 2)
         self.assertRaises(Program.DoesNotExist, Program.objects.get, pk=1)

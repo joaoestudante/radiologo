@@ -19,7 +19,7 @@ DEBUG = config.get("AppSettings", "Debug")
 
 ALLOWED_HOSTS = []
 
-BASE_URL = "localhost:8080/" if DEBUG else "https://radiologo.radiozero.pt"
+BASE_FRONTEND_URL = "http://localhost:8080" if DEBUG else "https://radiologo.radiozero.pt"
 
 # Application definition
 
@@ -32,7 +32,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'programs',
     'users',
-    'exceptions'
+    'exceptions',
+    'django_rest_passwordreset'
 ]
 
 MIDDLEWARE = [
@@ -50,7 +51,7 @@ ROOT_URLCONF = 'radiologo.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'radiologo/resources/')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -64,7 +65,6 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'radiologo.wsgi.application'
-
 
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
@@ -96,7 +96,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/3.0/topics/i18n/
 
@@ -123,6 +122,8 @@ DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 EMAIL_HTML = "radiologo/resources/invite_email.html"
 EMAIL_TXT = "radiologo/resources/invite_email.txt"
+PASSWORD_RESET_HTML = "password_reset.html"
+PASSWORD_RESET_TXT = "password_reset.txt"
 
 # Invite
 INVITE_EXPIRY_DAYS = 7

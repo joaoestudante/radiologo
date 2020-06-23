@@ -6,8 +6,9 @@ from django.contrib.auth import get_user_model
 from django.test import TestCase
 from rest_framework.test import APIClient
 from django.core import mail, signing
+from rest_framework_simplejwt.tokens import RefreshToken
 
-from users.models import Invite
+from users.models import Invite, CustomUser
 from users.serializers.InviteSerializer import InviteSerializer
 from users.services.UserService import UserService
 
@@ -25,6 +26,19 @@ class InviteAcceptTest(TestCase):
 
         self.user_service = UserService()
 
+        logged_in_user = CustomUser(email="logged@in.com",
+                                    password="password",
+                                    author_name="aaa",
+                                    full_name="aaaa", id_type=self.id_type,
+                                    id_number="123",
+                                    ist_student_options=self.ist_1, phone="1234")
+        logged_in_user.save()
+        token = RefreshToken.for_user(logged_in_user).access_token
+        self.auth_headers = {
+            'HTTP_AUTHORIZATION': 'Bearer ' + str(token)
+        }
+
+
     def test_accept(self):
         author_1 = self.user_service.create_user(email=self.email_1,
                                                  author_name=self.author_name_1,
@@ -33,11 +47,11 @@ class InviteAcceptTest(TestCase):
                                                  ist_student_options=self.ist_1, phone=self.phone_1)
         self.assertEquals(author_1.check_password(""), False)
         token = re.findall("register/[a-zA-Z0-9:/\-_]+", mail.outbox[0].body)[0].replace('register/', '')
-        self.client.post('/users/register/' + token + "/", data=json.dumps({"password": "thisismypassword123"}),
+        res = self.client.post('/users/register/' + token + "/", data=json.dumps({"password": "thisismypassword123"}),
                          content_type='application/json')
-        user = get_user_model().objects.get(pk=1)
+        user = get_user_model().objects.get(email=self.email_1)
         self.assertTrue(user.is_registered)
-        self.assertEquals(user.check_password("thisismypassword123"), True)
+        self.assertTrue(user.check_password("thisismypassword123"))
 
     def test_resend(self):
         # Send an invite, resend the invite, make sure the first one is unusable and the second one works
@@ -48,7 +62,7 @@ class InviteAcceptTest(TestCase):
                                                  id_number=self.id_number_1,
                                                  ist_student_options=self.ist_1, phone=self.phone_1)
 
-        invites_list = self.client.get('/users/invites/', format='json')
+        invites_list = self.client.get('/users/invites/', format='json', **self.auth_headers)
         author_name = dict(invites_list.data[0])["invited_user_author_name"]
         user = get_user_model().objects.get(author_name=author_name)
         invite = Invite.objects.get(invited_user=user)
@@ -58,7 +72,7 @@ class InviteAcceptTest(TestCase):
         first_token = invite.sent_token
 
         self.client.post('/users/invites/resend/', data=json.dumps({"invited_user_author_name": author_name}),
-                         content_type='application/json')
+                         content_type='application/json', **self.auth_headers)
         self.assertEqual(len(mail.outbox), 2)
 
         # Use the first token, should error out
