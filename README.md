@@ -17,6 +17,8 @@ python 3.8
 Redis
 sqlite3
 ffmpeg
+pandoc
+xetex/XeLaTeX
 ```
 Check [`backend/Pipfile`](https://github.com/joaoestudante/radiologo/blob/master/backend/Pipfile) for the most up to date python packages.
 
