@@ -33,9 +33,9 @@ class Invite(models.Model):
         token = self.generate_token()
         subject, from_email, to = "Bem vindo à Rádio Zero", settings.EMAIL_HOST_USER, self.invited_user.email
         with open(settings.EMAIL_TXT, 'r') as txt:
-            text_content = txt.read().replace("{{ REGISTER_LINK }}", settings.BASE_URL + "register/" + token)
+            text_content = txt.read().replace("{{ REGISTER_LINK }}", settings.BASE_FRONTEND_URL + "register/" + token)
         with open(settings.EMAIL_HTML, 'r') as html:
-            html_content = html.read().replace("{{ REGISTER_LINK }}", settings.BASE_URL + "register/" + token)
+            html_content = html.read().replace("{{ REGISTER_LINK }}", settings.BASE_FRONTEND_URL + "register/" + token)
         msg = EmailMultiAlternatives(subject, text_content, from_email, [to])
         msg.attach_alternative(html_content, "text/html")
         msg.send()

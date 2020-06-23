@@ -62,13 +62,13 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     exit_date = models.DateField(verbose_name=_("Exit Date"), default=None, null=True, blank=True)
     is_active = models.BooleanField(default=True)
     is_registered = models.BooleanField(default=False)
+    username = models.CharField(max_length=40, unique=False, default='', blank=True) # For compatibility with pass reset library
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ["author_name", "full_name", "id_type", "id_number", "ist_student_options", "phone", "state",
                        "entrance_date"]
 
     objects = CustomUserManager()
-
 
     def __str__(self):
         return self.author_name
