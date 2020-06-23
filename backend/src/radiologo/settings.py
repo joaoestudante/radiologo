@@ -33,6 +33,7 @@ INSTALLED_APPS = [
     'programs',
     'users',
     'exceptions',
+    'keys',
     'django_rest_passwordreset'
 ]
 

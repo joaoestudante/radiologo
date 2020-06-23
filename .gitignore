@@ -131,3 +131,4 @@ dmypy.json
 # Settings
 application.properties
 .idea/
+/backend/src/keys/generated/
