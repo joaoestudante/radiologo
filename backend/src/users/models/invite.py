@@ -6,6 +6,7 @@ from django.contrib.auth import get_user_model
 from django.core import signing
 from django.core.mail import EmailMultiAlternatives
 from django.db import models
+from django.template.loader import render_to_string
 from django.utils import timezone, crypto
 from .user import CustomUser
 
@@ -32,12 +33,13 @@ class Invite(models.Model):
     def send(self):
         token = self.generate_token()
         subject, from_email, to = "Bem vindo à Rádio Zero", settings.EMAIL_HOST_USER, self.invited_user.email
-        with open(settings.EMAIL_TXT, 'r') as txt:
-            text_content = txt.read().replace("{{ REGISTER_LINK }}", settings.BASE_FRONTEND_URL + "register/" + token)
-        with open(settings.EMAIL_HTML, 'r') as html:
-            html_content = html.read().replace("{{ REGISTER_LINK }}", settings.BASE_FRONTEND_URL + "register/" + token)
-        msg = EmailMultiAlternatives(subject, text_content, from_email, [to])
-        msg.attach_alternative(html_content, "text/html")
+
+        context = {"REGISTER_LINK":settings.BASE_FRONTEND_URL + "/register/" + token}
+        email_html_message = render_to_string(settings.EMAIL_HTML, context)
+        email_plaintext_message = render_to_string(settings.EMAIL_TXT, context)
+
+        msg = EmailMultiAlternatives(subject, email_plaintext_message, from_email, [to])
+        msg.attach_alternative(email_html_message, "text/html")
         msg.send()
         self.sent_token = token
         self.last_date_sent = timezone.now()

@@ -32,7 +32,7 @@ class InvitesTest(TestCase):
         self.assertEqual(invite.invited_user, author_1)
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(mail.outbox[0].subject, "Bem vindo à Rádio Zero")
-        self.assertIn(settings.BASE_FRONTEND_URL + "register/" + invite.sent_token, mail.outbox[0].body)
+        self.assertIn(settings.BASE_FRONTEND_URL + "/register/" + invite.sent_token, mail.outbox[0].body)
 
     def test_not_sent_if_inactive(self):
         author_1 = self.user_service.create_user(email=self.email_1,
