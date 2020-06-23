@@ -16,8 +16,6 @@ def password_reset_token_created(sender, instance, reset_password_token, *args, 
         'reset_password_url': "{}?token={}".format(settings.BASE_FRONTEND_URL + reverse('password_reset:reset-password-request'),
                                                    reset_password_token.key)
     }
-    print("reset url will be: {}?token={}".format(settings.BASE_FRONTEND_URL + reverse('password_reset:reset-password-request'),
-                                                  reset_password_token.key))
 
     email_html_message = render_to_string(settings.PASSWORD_RESET_HTML, context)
     email_plaintext_message = render_to_string(settings.PASSWORD_RESET_TXT, context)

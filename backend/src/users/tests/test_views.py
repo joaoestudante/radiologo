@@ -47,7 +47,7 @@ class InviteAcceptTest(TestCase):
                                                  ist_student_options=self.ist_1, phone=self.phone_1)
         self.assertEquals(author_1.check_password(""), False)
         token = re.findall("register/[a-zA-Z0-9:/\-_]+", mail.outbox[0].body)[0].replace('register/', '')
-        res = self.client.post('/users/register/' + token + "/", data=json.dumps({"password": "thisismypassword123"}),
+        self.client.post('/users/register/' + token + "/", data=json.dumps({"password": "thisismypassword123"}),
                          content_type='application/json')
         user = get_user_model().objects.get(email=self.email_1)
         self.assertTrue(user.is_registered)

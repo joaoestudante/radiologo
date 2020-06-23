@@ -120,8 +120,8 @@ EMAIL_HOST_USER = config.get("Email", "EmailHostUser")
 EMAIL_HOST_PASSWORD = config.get("Email", "EmailHostPassword")
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
-EMAIL_HTML = "radiologo/resources/invite_email.html"
-EMAIL_TXT = "radiologo/resources/invite_email.txt"
+EMAIL_HTML = "invite_email.html"
+EMAIL_TXT = "invite_email.txt"
 PASSWORD_RESET_HTML = "password_reset.html"
 PASSWORD_RESET_TXT = "password_reset.txt"
 
