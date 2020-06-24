@@ -20,7 +20,7 @@ class KeyDocService:
         return unidecode(value)
 
     def generate_file(self):
-        template_location = settings.TEMPLATES[0]["DIRS"][0]
+        template_location = settings.KEYS_TEMPLATE_DIR
         image_location = template_location + "rz_banner.png"
 
         locale.setlocale(locale.LC_TIME, "pt_PT.utf8")
@@ -55,7 +55,7 @@ class KeyDocService:
             "signature": signature,
             "list": members_list_str,
         }
-        final_md = render_to_string("keydoc.md", context)
+        final_md = render_to_string(settings.KEYDOC_MD, context)
 
         output_dir = os.getcwd() + "/keys/generated/"
         if not os.path.exists(output_dir):
