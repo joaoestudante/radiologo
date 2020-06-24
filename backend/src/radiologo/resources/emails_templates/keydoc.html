@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-    <title>Junta-te à Rádio Zero</title>
+    <title>Documento para requisição de chaves</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 </head>
 <body style="margin: 0; padding: 0;">
@@ -11,7 +11,7 @@
        style="font-family: Arial, sans-serif; font-size: 24px;">
     <tr>
         <td align="center" bgcolor="#000000" style="padding: 40px 0 30px 0;">
-            <p style="color: white"> Pedido para alterar password </p>
+            <p style="color: white"> Documento de requisição de chaves </p>
         </td>
     </tr>
     <tr>
@@ -19,21 +19,18 @@
             <table border="0" cellpadding="0" cellspacing="0" width="100%">
                 <tr>
                     <td bgcolor="#ffffff">
-                        Olá! Recebemos um pedido para alterar a tua password. Clica no botão em baixo para escolher uma
-                        nova:
+                        Foi efectuado um pedido para gerar um novo documento para autorização de requisição de chaves:
                     </td>
                 </tr>
                 <tr>
-                    <td align="center" bgcolor="#ffffff" style="padding: 40px 30px 40px 30px;">
-                        <a href="{{ reset_password_url }}"
-                           style="display:inline-block;padding:20px 20px 20px 20px; margin:0 10px 10px 0;border-radius:2em;box-sizing: border-box;text-decoration:none;font-weight:300;color:#FFFFFF;background-color:#000000;text-align:center;">Escolher
-                            nova password</a>
+                    <td bgcolor="#ffffff" style="padding: 30px 0 30px 0 ">
+                        <b>Efectuado por:</b> {{ requester }} <br/>
+                        <b>Data do pedido:</b> {{ request_date }}
                     </td>
                 </tr>
                 <tr>
                     <td bgcolor="#ffffff">
-                        Em alternativa, se não conseguires, acede directamente a este link: <br/> <br/> <a
-                            href="{{ reset_password_url }}">Escolher nova password</a>.
+                        O documento encontra-se em anexo deste email.
                     </td>
                 </tr>
             </table>

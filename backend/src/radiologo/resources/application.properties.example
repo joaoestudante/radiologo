@@ -16,6 +16,7 @@ EmailHostUser =
 EmailHostPassword =
 EmailPort =
 EmailTLS =
+AdminEmail =
 
 [AppSettings]
 SecretKey =

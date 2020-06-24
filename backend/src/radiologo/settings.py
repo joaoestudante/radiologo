@@ -52,7 +52,8 @@ ROOT_URLCONF = 'radiologo.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'radiologo/resources/')],
+        'DIRS': [os.path.join(BASE_DIR, 'radiologo/resources/emails_templates'),
+                 os.path.join(BASE_DIR, 'radiologo/resources/keys_templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -64,6 +65,9 @@ TEMPLATES = [
         },
     },
 ]
+
+KEYS_TEMPLATE_DIR = os.path.join(BASE_DIR, 'radiologo/resources/keys_templates/')
+KEYDOC_MD = "keydoc.md"
 
 WSGI_APPLICATION = 'radiologo.wsgi.application'
 
@@ -125,6 +129,9 @@ EMAIL_HTML = "invite_email.html"
 EMAIL_TXT = "invite_email.txt"
 PASSWORD_RESET_HTML = "password_reset.html"
 PASSWORD_RESET_TXT = "password_reset.txt"
+KEYDOC_HTML = "keydoc.html"
+KEYDOC_TXT = "keydoc.txt"
+ADMIN_EMAIL = config.get("Email", "AdminEmail")
 
 # Invite
 INVITE_EXPIRY_DAYS = 7
