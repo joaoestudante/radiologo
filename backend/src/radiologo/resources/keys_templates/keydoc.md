@@ -1,5 +1,4 @@
 ---
-mainfont: Ubuntu
 geometry:
 - top=1.8cm
 - bottom=1.8cm
@@ -32,17 +31,17 @@ Cada pessoa só pode requisitar uma das cópias da chave de cada vez. Para o faz
 
 \end{flushleft}
 
-\begin{flushright}
 
-P'lo Conselho de Gestão da Rádio Zero,
+
+\hfill P'lo Conselho de Gestão da Rádio Zero,
 
 \vspace{0.6cm}
 
-{{ signature_space }}
+\hfill {{ signature_space }}
 
-{{ signature }}
+\hfill {{ signature }}
 
-\end{flushright}
+
 
 | Nome Completo | Núm. Identificação | Núm. Aluno IST |
 |---------------| ------------------ | -------------- |

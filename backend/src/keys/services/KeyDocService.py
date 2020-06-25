@@ -46,8 +46,9 @@ class KeyDocService:
 
     def build_context(self) -> dict:
         image_location = settings.KEYS_TEMPLATE_DIR + "rz_banner.png"
-        locale.setlocale(locale.LC_TIME, "pt_PT.utf8")
-        today = datetime.now().strftime("%A, %d %B %Y").title()
+        #locale.setlocale(locale.LC_TIME, "pt_PT.utf8")
+        #today = datetime.now().strftime("%A, %d %B %Y").title()
+        today = datetime.now().strftime("%d-%m-%Y")
         signature = "{} ({}, {})".format(self.keydoc.creator.author_name, self.keydoc.creator.phone,
                                          self.keydoc.creator.email)
         signature_space = "_" * len(signature)
@@ -85,9 +86,7 @@ class KeyDocService:
         with open(output_dir + "latest_keydoc.md", "w") as md:
             md.write(final_md)
         subprocess.run(
-            ["pandoc", output_dir + "latest_keydoc.md", "-o", output_dir + "latest_keydoc.pdf", "--pdf-engine=xelatex",
-             "--template",
-             settings.KEYS_TEMPLATE_DIR + "eisvogel.tex"])
+            ["pandoc", output_dir + "latest_keydoc.md", "-o", output_dir + "latest_keydoc.pdf", "--pdf-engine=xelatex"])
         return output_dir + "latest_keydoc.pdf"
 
     def checkNeedsGeneration(self, previous_doc, new_doc):

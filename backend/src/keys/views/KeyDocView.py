@@ -25,7 +25,7 @@ class KeyDocGenerate(APIView):
         subject, from_email, to = "Documento para requisição de chaves", settings.EMAIL_HOST_USER, settings.ADMIN_EMAIL
         context = {
             "requester": request.user.author_name,
-            "request_date": now.strftime("%Y-%m-%d, às %H:%M ") + settings.timezone
+            "request_date": now.strftime("%Y-%m-%d, às %H:%M ") + settings.TIME_ZONE
         }
         email_html_message = render_to_string(settings.KEYDOC_HTML, context)
         email_plaintext_message = render_to_string(settings.KEYDOC_TXT, context)
