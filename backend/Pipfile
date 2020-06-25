@@ -11,6 +11,7 @@ djangorestframework = "*"
 unidecode = "*"
 djangorestframework-simplejwt = "*"
 django-rest-passwordreset = "*"
+gunicorn = "*"
 
 [requires]
 python_version = "3.8"
