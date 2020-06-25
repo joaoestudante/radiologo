@@ -45,5 +45,4 @@ class KeyDocInfo(APIView):
             return Response(status=status.HTTP_200_OK, data=json.dumps({"detail":"No document has been generated yet."}))
 
         serialized = KeyDocSerializer(doc)
-        print(serialized.data)
         return Response(serialized.data, status=status.HTTP_200_OK)
