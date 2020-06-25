@@ -33,3 +33,8 @@ class InviteAlreadyAcceptedException(RadiologoException):
     status_code = 400
     default_detail = 'Registration has already been made.'
     default_code = 'already_registered'
+
+class NoNewMembersForKeyDocException(RadiologoException):
+    status_code = 400
+    default_detail = 'There are no new members registered since the latest generated document.'
+    default_code = 'no_new_members'

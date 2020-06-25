@@ -7,4 +7,4 @@ class KeyDoc(models.Model):
     creator = models.ForeignKey(get_user_model(), on_delete=models.DO_NOTHING)
     date_created = models.DateTimeField(default=timezone.now)
     members_when_created = models.IntegerField(default=0)
-    doc = models.CharField(max_length=512, default="")
+    doc_hash = models.CharField(max_length=512, default="")
