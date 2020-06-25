@@ -27,6 +27,7 @@ Check [`backend/Pipfile`](https://github.com/joaoestudante/radiologo/blob/master
 
 ### Docker :whale:
 * `cd` into the root directory.
+* Rename the `/backend/src/radiologo/resources/application.properties.example` to `application.properties` (remove the `.example`) and fill the missing fields correctly.
 * Build image and start in the background:
   - `docker-compose build`
   - `docker-compose up -d`
