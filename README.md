@@ -25,6 +25,16 @@ Check [`backend/Pipfile`](https://github.com/joaoestudante/radiologo/blob/master
 
 ## Installation
 
+### Docker :whale:
+* `cd` into the root directory.
+* Build image and start in the background:
+  - `docker-compose build`
+  - `docker-compose up -d`
+* Check that the expected services are running:
+  - `docker ps` or `docker-compose ps`
+
+
+### Traditional
 Start by installing `pipenv`:
 ```
 pip3 install pipenv

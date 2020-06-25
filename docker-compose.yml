@@ -1,0 +1,12 @@
+version: '3.3'
+
+services:
+  backend:
+    build: ./backend/
+    volumes:
+      - ./backend/:/code
+    image: radiologo-backend
+    container_name: backend
+    ports:
+      - "8000:8000"
+    command: pipenv run python manage.py runserver 0.0.0.0:8000
