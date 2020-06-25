@@ -14,8 +14,8 @@ ArchiveServer.rootUploadDirectory =
 EmailHost =
 EmailHostUser =
 EmailHostPassword =
-EmailPort =
-EmailTLS =
+EmailPort = 587
+EmailTLS = True
 AdminEmail =
 
 [AppSettings]
