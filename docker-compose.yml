@@ -1,11 +1,43 @@
 version: '3.3'
 
 services:
+  redis:
+    image: redis:6-buster
+    container_name: rd01
+    ports:
+      - '6379:6379'
+
   backend:
-    build: ./backend/
-    volumes:
-      - ./backend/:/code
+    container_name: radiologo-backend
+    build:
+      context: ./backend/
+      dockerfile: Dockerfile
     image: radiologo-backend
-    container_name: backend
+    stdin_open: true
+    tty: true
+    volumes:
+      - ./backend:/var/www/radiologo
     ports:
       - "8000:8000"
+    links:
+      - redis
+    depends_on:
+      - celery
+
+  celery:
+    build: ./backend/
+    command: pipenv run celery -A radiologo worker -B --loglevel=DEBUG
+    volumes:
+      - ./backend:/var/www/radiologo
+    links:
+      - redis
+
+  monitor:
+    build: ./backend/
+    ports:
+      - "5555:5555"
+    entrypoint: pipenv run flower
+    command:  -A radiologo --port=5555 --broker=redis://redis:6379/0
+    depends_on:
+      - redis
+      - celery
