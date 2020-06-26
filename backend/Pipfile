@@ -12,6 +12,9 @@ unidecode = "*"
 djangorestframework-simplejwt = "*"
 django-rest-passwordreset = "*"
 gunicorn = "*"
+celery = "*"
+redis = "*"
+flower = "*"
 
 [requires]
 python_version = "3.8"

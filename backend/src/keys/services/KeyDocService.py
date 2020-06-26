@@ -86,7 +86,9 @@ class KeyDocService:
         with open(output_dir + "latest_keydoc.md", "w") as md:
             md.write(final_md)
         subprocess.run(
-            ["pandoc", output_dir + "latest_keydoc.md", "-o", output_dir + "latest_keydoc.pdf", "--pdf-engine=xelatex"])
+            ["pandoc", output_dir + "latest_keydoc.md", "-o", output_dir + "latest_keydoc.pdf", "--pdf-engine=xelatex",
+             "--template",
+             settings.KEYS_TEMPLATE_DIR  + "eisvogel.tex"])
         return output_dir + "latest_keydoc.pdf"
 
     def checkNeedsGeneration(self, previous_doc, new_doc):

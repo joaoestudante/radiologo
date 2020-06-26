@@ -1,4 +1,5 @@
 ---
+mainfont: Ubuntu
 geometry:
 - top=1.8cm
 - bottom=1.8cm
