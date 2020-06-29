@@ -24,7 +24,7 @@ class FileChecker:
         self.warnings = []
 
     def run_checks(self):
-        default_params = ["-ar", self.min_sample_rate, "-ac", 2]  # 2 = number of channels
+        default_params = ["-ar", self.min_sample_rate, "-ac", '2']  # 2 = number of channels
 
         tempo = self.check_duration(float(self.info['duration']) / 60)
         self.check_sample_rate(self.info['sample_rate'])
@@ -34,6 +34,7 @@ class FileChecker:
             raise IrrecoverableProblemsException("There are serious problems with the file and it can't be exported.")
 
         if self.do_normalization:
+            print("\t\t* Applying 2 pass loudnorm...")
             loudnorm_list = self.build_loudnorm_list(self.read_loudnorm_data())
             loudnorm_list[-1] += "," + str(tempo)
             return default_params + loudnorm_list
@@ -100,7 +101,7 @@ class FileChecker:
             return measured_duration / closest_duration
 
         elif closest_duration < measured_duration <= closest_duration * 1.03:  # If we're here, it's within the 3% range.
-            self.problems.append(
+            self.warnings.append(
                 FileDurationAboveFixed(measured_duration, closest_duration)
             )
             return measured_duration / closest_duration
