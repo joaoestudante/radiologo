@@ -4,6 +4,7 @@ import hashlib
 from datetime import datetime
 import subprocess
 
+from celery import shared_task
 from django.db import transaction
 from django.template.loader import render_to_string
 

@@ -15,6 +15,7 @@ gunicorn = "*"
 celery = "*"
 redis = "*"
 flower = "*"
+pydub = "*"
 
 [requires]
 python_version = "3.8"

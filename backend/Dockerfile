@@ -6,9 +6,9 @@ RUN DEBIAN_FRONTEND="noninteractive" apt-get install -y \
     vim \
     pandoc \
     texlive-xetex \
-    python3-pip
-
-RUN DEBIAN_FRONTEND="noninteractive" apt-get install -y fonts-ubuntu
+    python3-pip \
+    fonts-ubuntu \
+    ffmpeg
 
 ARG PROJECT=radiologo
 ARG PROJECT_DIR=/var/www/${PROJECT}
