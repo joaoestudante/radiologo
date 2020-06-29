@@ -68,6 +68,7 @@ TEMPLATES = [
 
 KEYS_TEMPLATE_DIR = os.path.join(BASE_DIR, 'radiologo/resources/keys_templates/')
 KEYDOC_MD = "keydoc.md"
+FILE_UPLOAD_DIR = os.path.join(BASE_DIR, 'programs/uploaded/')
 
 WSGI_APPLICATION = 'radiologo.wsgi.application'
 
