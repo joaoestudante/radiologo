@@ -76,7 +76,7 @@ class FileChecker:
              "measured_LRA={}:"
              "measured_TP={}:"
              "measured_thresh={}:"
-             "offset={}:linear=true").format(
+             "offset={}").format(
                 data["input_i"],
                 data["input_lra"],
                 data["input_tp"],
@@ -91,7 +91,7 @@ class FileChecker:
         #Set a 3dB tolerance for volume
         measured_i = normalization_data["input_i"]
         target_i = -16.0
-        tolerance_i = 3.0
+        tolerance_i = 2.0
         if abs(measured_i - target_i) > tolerance_i:
             self.warnings.append(FileNotNormalized(measured_i, target_i))
         
@@ -99,7 +99,7 @@ class FileChecker:
         measured_lra = normalization_data["input_lra"]
         maximum_lra = 13.0
         if measured_lra > maximum_lra:
-            self.warnings.append(FileDynamicRange(measured_lra, -11.0))
+            self.warnings.append(FileDynamicRange(measured_lra, 11.0))
         
         #Set true peak normalization
         if normalization_data["input_tp"] >= 0.0:
