@@ -2,7 +2,8 @@ import json
 import subprocess
 
 from programs.services.processing.Messages import FileDurationAboveFixed, FileDurationBelowLimit, \
-    FileDurationAboveLimit, SampleRateBelowMinimum, BitRateBelowMinimum, BitRateBelowRecommended
+    FileDurationAboveLimit, SampleRateBelowMinimum, BitRateBelowMinimum, BitRateBelowRecommended, \
+    FileHasClipping, FileNotNormalized, FileDynamicRange
 
 
 class FileChecker:
@@ -26,17 +27,18 @@ class FileChecker:
     def run_checks(self):
         default_params = ["-ar", self.min_sample_rate, "-ac", '2']  # 2 = number of channels
 
-        tempo = self.check_duration(float(self.info['duration']) / 60)
+        measured_duration = self.check_duration(float(self.info['duration']) / 60)
         self.check_sample_rate(self.info['sample_rate'])
         self.check_bitrate(self.info['bit_rate'])
+        normalization_data = self.check_normalization_clipping()
 
         if len(self.problems) > 0:
             raise IrrecoverableProblemsException("There are serious problems with the file and it can't be exported.")
 
         if self.do_normalization:
             print("\t\t* Applying 2 pass loudnorm...")
-            loudnorm_list = self.build_loudnorm_list(self.read_loudnorm_data())
-            loudnorm_list[-1] += "," + str(tempo)
+            loudnorm_list = self.build_loudnorm_list(normalization_data)
+            loudnorm_list[-1] += "," + str(measured_duration) #Include duration correction
             return default_params + loudnorm_list
         else:
             return default_params
@@ -82,6 +84,28 @@ class FileChecker:
                 data["target_offset"]
             )
         ]
+    
+    def check_normalization_clipping(self):
+        normalization_data = read_loudnorm_data()
+
+        #Set a 3dB tolerance for volume
+        measured_i = normalization_data["input_i"]
+        target_i = -16.0
+        tolerance_i = 3.0
+        if abs(measured_i - target_i) > tolerance_i:
+            self.warnings.append(FileNotNormalized(measured_i, target_i))
+        
+        #Set dynamic range limit
+        measured_lra = normalization_data["input_lra"]
+        maximum_lra = 13.0
+        if measured_lra > maximum_lra:
+            self.warnings.append(FileDynamicRange(measured_lra, -11.0))
+        
+        #Set true peak normalization
+        if normalization_data["input_tp"] >= 0.0:
+            self.problems.append(FileHasClipping)
+
+        return normalization_data
 
     def check_duration(self, measured_duration: float):
         closest_duration = min(self.durations, key=lambda x: abs(x - measured_duration))
