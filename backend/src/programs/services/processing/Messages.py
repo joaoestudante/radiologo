@@ -13,8 +13,8 @@ class Message(ABC):
 
 class BitRateBelowRecommended(Message):
     def message(self):
-        return "O bitrate do ficheiro da emissão é de {0}, e está " \
-               "abaixo dos {1} kbps, o que compromete um pouco a qualidade do áudio. " \
+        return "O bitrate do ficheiro da emissão é de {0} kbps, estando " \
+               "abaixo dos {1} kbps. Isto compromete um pouco a qualidade do áudio. " \
                "Ainda assim, a emissão está pronta a ir para o ar. Na próxima emissão, " \
                "certifica-te que exportas o ficheiro com um bitrate de {1} kbps.".format(self.measured_value,
                                                                                          self.recommended_value)
@@ -22,7 +22,7 @@ class BitRateBelowRecommended(Message):
 
 class BitRateBelowMinimum(Message):
     def message(self):
-        return "O bitrate do ficheiro é de {}, estando abaixo dos {} kbps, o que " \
+        return "O bitrate do ficheiro é de {} kbps, estando abaixo dos {} kbp. Isto " \
                "compromete seriamente a qualidade do áudio. Verifica se o episódio foi " \
                "exportado com as definições correctas. Se não, grava novamente o " \
                "episódio.".format(self.measured_value,
@@ -31,8 +31,8 @@ class BitRateBelowMinimum(Message):
 
 class SampleRateBelowMinimum(Message):
     def message(self):
-        return "A frequência de amostragem (sampling rate) do ficheiro é de {}, e está " \
-               "abaixo dos {} Hz, o que compromete seriamente a qualidade do áudio. " \
+        return "A frequência de amostragem (sampling rate) do ficheiro é de {} Hz, estando " \
+               "abaixo dos {} Hz. Isto compromete seriamente a qualidade do áudio. " \
                "Verifica se o episódio foi exportado com as definições correctas. " \
                "Se não, grava novamente o episódio.".format(self.measured_value,
                                                             self.recommended_value)
@@ -40,7 +40,7 @@ class SampleRateBelowMinimum(Message):
 
 class FileDurationAboveLimit(Message):
     def message(self):
-        return "A emissão tinha {0} minutos, estando acima dos {1} minutos, o que " \
+        return "A emissão tinha {0} minutos, estando acima dos {1} minutos. Isto " \
                "impossibilita o ajuste automático. Por favor, edita o ficheiro " \
                "para um máximo de {1} minutos e envia de novo.".format(self.measured_value,
                                                                        self.recommended_value)

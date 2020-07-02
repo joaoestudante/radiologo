@@ -1,0 +1,12 @@
+Este é um e-mail automático de confirmação de envio do ficheiro. Não precisas de responder.
+
+O ficheiro da emissão para {{ program_name }}, no dia {{ emission_date }}, não foi processado porque:
+
+{% for problem in problems %}
+* {{problem.message}}
+{% endfor %}
+
+Em caso de dúvida, contacta o Dep. de Programação (programacao@radiozero.pt).
+
+Obrigada pelo envio!
+  Rádio Zero

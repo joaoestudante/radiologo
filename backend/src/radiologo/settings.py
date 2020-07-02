@@ -132,6 +132,12 @@ PASSWORD_RESET_HTML = "password_reset.html"
 PASSWORD_RESET_TXT = "password_reset.txt"
 KEYDOC_HTML = "keydoc.html"
 KEYDOC_TXT = "keydoc.txt"
+UPLOAD_ACCEPT_TXT = "upload_accepted.txt"
+UPLOAD_ACCEPT_HTML = "upload_accepted.html"
+UPLOAD_REJECT_HTML = "upload_rejected.html"
+UPLOAD_REJECT_TXT = "upload_rejected.txt"
+UPLOAD_FAIL_HTML = "upload_failed.html"
+UPLOAD_FAIL_TXT = "upload_failed.txt"
 ADMIN_EMAIL = config.get("Email", "AdminEmail")
 
 # Invite
