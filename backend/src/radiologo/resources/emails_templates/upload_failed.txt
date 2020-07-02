@@ -1,0 +1,8 @@
+Este é um email automático.
+
+Infelizmente, houve um problema com o envio ou processamento da emissão para {{ program_name }}, no dia {{ emission_date }}.
+
+Por favor, notifica a Rádio Zero, respondendo a este email, ou contactando o departamento técnico/de programação.
+
+Pedimos desculpa pelos incómodos causados,
+  Rádio Zero
