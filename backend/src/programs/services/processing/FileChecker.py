@@ -109,14 +109,17 @@ class FileChecker:
 
     def check_duration(self, measured_duration: float):
         closest_duration = min(self.durations, key=lambda x: abs(x - measured_duration))
-
+        seconds = measured_duration*60
+        minutes, seconds = divmod(seconds, 60)
+        minutes, seconds = int(minutes), int(seconds)
+        measured_duration_display = f'{minutes:02}:{seconds:02}'
         if measured_duration > closest_duration * 1.03:
             self.problems.append(
-                FileDurationAboveLimit(measured_duration, closest_duration))
+                FileDurationAboveLimit(measured_duration_display, closest_duration))
 
         elif measured_duration < closest_duration * 0.8:
             self.problems.append(
-                FileDurationBelowLimit(measured_duration, closest_duration))
+                FileDurationBelowLimit(measured_duration_display, closest_duration))
 
         elif closest_duration * 0.8 <= measured_duration < closest_duration * 0.97:  # Low but accepted.
             return 1
@@ -125,9 +128,10 @@ class FileChecker:
             return measured_duration / closest_duration
 
         elif closest_duration < measured_duration <= closest_duration * 1.03:  # If we're here, it's within the 3% range.
-            self.warnings.append(
-                FileDurationAboveFixed(measured_duration, closest_duration)
-            )
+            if seconds > 0:
+                self.warnings.append(
+                    FileDurationAboveFixed(measured_duration_display, closest_duration)
+                )
             return measured_duration / closest_duration
 
         else:
@@ -139,10 +143,10 @@ class FileChecker:
 
     def check_bitrate(self, measured_bitrate):
         if self.min_bitrate <= measured_bitrate[:3] < self.recommended_bitrate:
-            self.warnings.append(BitRateBelowRecommended(measured_bitrate, self.recommended_bitrate))
+            self.warnings.append(BitRateBelowRecommended(measured_bitrate[:3], self.recommended_bitrate))
 
         elif self.min_bitrate > measured_bitrate[:3]:
-            self.problems.append(BitRateBelowMinimum(measured_bitrate, self.min_bitrate))
+            self.problems.append(BitRateBelowMinimum(measured_bitrate[:3], self.min_bitrate))
 
 
 class IrrecoverableProblemsException(Exception):

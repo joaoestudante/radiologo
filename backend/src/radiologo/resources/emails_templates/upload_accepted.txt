@@ -1,0 +1,15 @@
+Este é um e-mail automático de confirmação de envio do ficheiro. Não precisas de responder.
+
+O envio da emissão foi feito com sucesso.
+{% if not warnings %}
+A emissão para {{ program_name }}, no dia {{ emission_date }}, está pronta a ir para o ar. Não precisas de fazer mais nada.
+{% else %}
+Notas:
+{% for warning in warnings %}
+* {{warning.message}}
+{% endfor %}
+{% endif %}
+Em caso de dúvida, contacta o Dep. de Programação (programacao@radiozero.pt)
+
+Obrigada pelo envio!
+  Rádio Zero
