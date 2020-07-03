@@ -58,7 +58,7 @@ class FileDurationBelowLimit(Message):
 class FileDurationAboveFixed(Message):
     def message(self):
         return "O ficheiro da emissão tinha {0} minutos, estando acima dos " \
-               "{1} minutos, mas foi ajustada automaticamente e está pronta para ir " \
+               "{1} minutos, mas foi ajustado automaticamente e está pronta para ir " \
                "para o ar. Não precisas de fazer mais nada.".format(self.measured_value,
                                                                     self.recommended_value)
 
@@ -67,7 +67,7 @@ class FileHasClipping(Message):
         return "O ficheiro da emissão possuia clipping, ou seja, um pico acima do volume " \
                 "máximo da transmissão. Assegure-se que quando faz a gravação, e durante " \
                 "a mistura, não excede o volume máximo (0 dB). Por favor, remistura o teu " \
-                "ficheiro de forma a que não existam estes picos e envia de novo."
+                "ficheiro de forma a baixar ligeiramente o volume nos picos e envia de novo."
 
 class FileNotNormalized(Message):
     def message(self):
@@ -78,7 +78,8 @@ class FileNotNormalized(Message):
 
 class FileDynamicRange(Message):
     def message(self):
-        return "O ficheiro de emissão tinha uma dinâmica de som de {0} dB (variação de volume " \
-                "entre partes altas e silenciosas) que é superior a {1} dB indicado para a emissão, " \
-                "mas foi ajustada automaticamente e está pronto a ir ao ar. Não precisas de fazer " \
+        return "O ficheiro de emissão tinha uma variação de volume entre partes altas e " \
+                "silenciosas muito grande (dinâmica de som). A dinâmica de {0} dB LU é maior " \
+                "do que os {1} dB LU indicados para a emissão, mas o som foi comprimido " \
+                "automaticamente e está pronto a ir ao ar. Não precisas de fazer " \
                 "mais nada.".format(self.measured_value, self.recommended_value)
