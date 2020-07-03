@@ -88,7 +88,7 @@ class FileChecker:
     def check_normalization_clipping(self):
         normalization_data = read_loudnorm_data()
 
-        #Set a 3dB tolerance for volume
+        #Set a 2dB tolerance for volume
         measured_i = normalization_data["input_i"]
         target_i = -16.0
         tolerance_i = 2.0
@@ -102,7 +102,7 @@ class FileChecker:
             self.warnings.append(FileDynamicRange(measured_lra, 11.0))
         
         #Set true peak normalization
-        if normalization_data["input_tp"] >= 0.0:
+        if normalization_data["input_tp"] >= -0.2:
             self.problems.append(FileHasClipping)
 
         return normalization_data
