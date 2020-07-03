@@ -1,4 +1,3 @@
-import json
 import os
 from datetime import datetime
 from django.conf import settings
@@ -9,14 +8,16 @@ from pydub import AudioSegment
 
 from programs.services.UploadService import UploadService
 from programs.services.processing.FileChecker import FileChecker, IrrecoverableProblemsException
+from radiologo.emailservice import EmailService
 
 
 class ProcessingService:
-    def __init__(self, path: str, emission_date: str, program_name: str, author_name: str, weekday: str,
+    def __init__(self, path: str, emission_date: str, program_name: str, author_name: str, email: str, weekday: str,
                  already_normalized: bool, adjust_duration: bool):
         self.uploaded_file_path = path
         self.program_name = program_name
         self.author_name = author_name
+        self.email = email
         self.weekday = weekday
         self.emission_date = emission_date
         self.already_normalized = already_normalized
@@ -28,7 +29,11 @@ class ProcessingService:
         self.collected_warnings = []
 
         self.upload_service = UploadService()
-        self.email_service = EmailService(self.collected_problems, self.collected_warnings)
+
+        display_emission_date = emission_date[:4] + "-" + emission_date[4:6] + "-" + emission_date[6:]
+        self.email_service = EmailService(
+            subject="Relatório de envio do programa {} para o dia {}".format(program_name, display_emission_date),
+            to=email)
 
         # Settings
         self.min_sample_rate = '44100'  # Hz
@@ -67,11 +72,19 @@ class ProcessingService:
             print("\t* Uploading...")
             self.upload_service.upload_program_to_archive(self.output_file_path)
             print("\t* Sending email...")
-            self.email_service.send_upload_accepted(self.author_name, checker)
+            self.email_service.send_upload_accepted(checker=checker, program_name=self.program_name,
+                                                    emission_date=self.emission_date)
 
         except IrrecoverableProblemsException:
             print("\t\t- File has bad problems, sending email...")
-            self.email_service.send_upload_rejected(self.author_name, checker)
+            self.email_service.send_upload_rejected(checker=checker, program_name=self.program_name,
+                                                    emission_date=self.emission_date)
+
+        except Exception as e:
+            print("- Something unexpected happened, sending email...")
+            print(e)
+            self.email_service.send_upload_failed(program_name=self.program_name,
+                                                  emission_date=self.emission_date)
 
         finally:
             print("\t* Cleaning up...")
@@ -79,7 +92,7 @@ class ProcessingService:
 
     def build_tags(self, info):
         for tag in info.get("TAG", []):
-            if tag in self.tags: # Only retrieve the tags we want
+            if tag in self.tags:  # Only retrieve the tags we want
                 self.tags[tag] = info.get("TAG", None)[tag]
 
         if not self.tags["artist"]:
@@ -127,15 +140,3 @@ class ProcessingService:
         except Exception as e:
             print("Error deleting uploaded file. Exception was:")
             print(e)
-
-
-class EmailService:
-    def __init__(self, problems, warnings):
-        self.problems = problems
-        self.warnings = warnings
-
-    def send_upload_rejected(self, author_name, checker):
-        pass
-
-    def send_upload_accepted(self, author_name, checker):
-        pass
