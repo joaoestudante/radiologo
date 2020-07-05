@@ -8,6 +8,8 @@ from django.core.mail import EmailMultiAlternatives
 from django.db import models
 from django.template.loader import render_to_string
 from django.utils import timezone, crypto
+
+from radiologo.emailservice import EmailService
 from .user import CustomUser
 
 
@@ -32,15 +34,10 @@ class Invite(models.Model):
 
     def send(self):
         token = self.generate_token()
-        subject, from_email, to = "Bem vindo à Rádio Zero", settings.EMAIL_HOST_USER, self.invited_user.email
 
-        context = {"REGISTER_LINK":settings.BASE_FRONTEND_URL + "/register/" + token}
-        email_html_message = render_to_string(settings.EMAIL_HTML, context)
-        email_plaintext_message = render_to_string(settings.EMAIL_TXT, context)
+        email_service = EmailService(subject="Bem vindo à Rádio Zero", to=self.invited_user.email)
+        email_service.send_invite(token=token)
 
-        msg = EmailMultiAlternatives(subject, email_plaintext_message, from_email, [to])
-        msg.attach_alternative(email_html_message, "text/html")
-        msg.send()
         self.sent_token = token
         self.last_date_sent = timezone.now()
         self.save()
