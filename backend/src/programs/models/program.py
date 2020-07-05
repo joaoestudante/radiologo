@@ -34,6 +34,8 @@ class Program(models.Model):
                                                                "automaticamente, selecciona esta opção.")
     is_external = models.BooleanField(default=False)
     state = models.CharField(verbose_name="Estado", choices=STATES, default="A", max_length=15)
+    rss_feed_status = models.BooleanField(verbose_name="Status do upload automático com Feed RSS",default=False)
+    rss_feed_url = models.CharField(verbose_name="Endereço do Feed RSS", default="")
 
     def __str__(self):
         return self.name
