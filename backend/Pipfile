@@ -16,6 +16,7 @@ celery = "*"
 redis = "*"
 flower = "*"
 pydub = "*"
+feedparser = "*"
 
 [requires]
 python_version = "3.8"
