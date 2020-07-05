@@ -115,6 +115,7 @@ class GetUpdateDeleteRSSView(APIView):
             return Response(status=status.HTTP_406_NOT_ACCEPTABLE)
         program.rss_feed_url = new_url
         program.rss_feed_status = new_status
+        return Response(status=status.HTTP_201_CREATED, data=json.dumps({'feed_url': program.rss_feed_url, 'feed_status': program.rss_feed_status})
 
     def delete(self, request, pk):
         program = get_object_or_404(Program, pk=pk)
