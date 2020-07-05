@@ -62,7 +62,7 @@ class RSSRetriever:
 					date = episode.published_parsed, \
 					link = Link(href=episode.enclosures[0].href, type=episode.enclosures[0].type)) \
 	     	      for episode in parsed.entries]
-		episodelist.sort(reverse=True, key=attrgetter('date'))
+		self.episodelist.sort(reverse=True, key=attrgetter('date'))
 		return self.episodelist, self.name
 
 	def downloadEpisode (destpath, episode):
