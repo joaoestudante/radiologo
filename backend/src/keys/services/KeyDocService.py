@@ -52,7 +52,7 @@ class KeyDocService:
         today = datetime.now().strftime("%d-%m-%Y")
         signature = "{} ({}, {})".format(self.keydoc.creator.author_name, self.keydoc.creator.phone,
                                          self.keydoc.creator.email)
-        signature_space = "_" * len(signature)
+        signature_space = "_" * (len(self.keydoc.creator.author_name) + 15)
 
         members_list = []
         for user in get_user_model().objects.all().order_by('author_name'):
