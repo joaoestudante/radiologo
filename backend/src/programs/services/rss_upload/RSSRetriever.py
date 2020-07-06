@@ -96,7 +96,7 @@ class RSSRetriever:
 
 	def downloadLastEpisode(normalized_name):
 		"""Automatically download last episode"""
-		episodes = listEpisodesinPodcast(self.url)
+		episodes = listEpisodesinPodcast(self.feed_url)
 		destpath = downloadEpisode(settings.FILE_UPLOAD_DIR + "uploaded_feed_" + normalized_name, episodes[0])
 		#Introduce a function that hands over to processing here
 		#e.g. ProcessFile(destpath_ext)
