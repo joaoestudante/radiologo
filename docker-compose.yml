@@ -46,7 +46,8 @@ services:
     build:
       context:  ./frontend/
       dockerfile: Dockerfile
-
+    volumes:
+      - ./frontend/:/app
     image: radiologo-frontend
     container_name: frontend
     depends_on:
@@ -54,5 +55,5 @@ services:
     links:
       - backend
     ports:
-      - "8001:80"
+      - "8080:80"
     restart: unless-stopped
