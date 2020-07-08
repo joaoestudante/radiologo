@@ -97,7 +97,7 @@ class GetUpdateDeleteRSSView(APIView):
         program = get_object_or_404(Program, pk=pk)
         rss_feed_url = program.rss_feed_url
         rss_status = program.rss_feed_status
-        return Response(status=status.HTTP_200_OK, data=json.dumps({'feed_url':rss_feed_url, 'feed_status':rss_status})
+        return Response(status=status.HTTP_200_OK, data=json.dumps({'feed_url':rss_feed_url, 'feed_status':rss_status}))
 
     def patch(self, request, pk):
         program = get_object_or_404(Program, pk=pk)
@@ -111,11 +111,14 @@ class GetUpdateDeleteRSSView(APIView):
             assert type(new_status) is bool
             validate = URLValidator()
             validate(new_url)
-        except ValidationError, AssertionError as e:
+        except ValidationError:
             return Response(status=status.HTTP_406_NOT_ACCEPTABLE)
+        except AssertionError:
+            return Response(status=status.HTTP_406_NOT_ACCEPTABLE)
+
         program.rss_feed_url = new_url
         program.rss_feed_status = new_status
-        return Response(status=status.HTTP_201_CREATED, data=json.dumps({'feed_url': program.rss_feed_url, 'feed_status': program.rss_feed_status})
+        return Response(status=status.HTTP_201_CREATED, data=json.dumps({'feed_url': program.rss_feed_url, 'feed_status': program.rss_feed_status}))
 
     def delete(self, request, pk):
         program = get_object_or_404(Program, pk=pk)
