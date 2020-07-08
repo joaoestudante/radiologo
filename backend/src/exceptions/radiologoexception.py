@@ -63,3 +63,9 @@ class FileBeingProcessedException(RadiologoException):
     status_code = 400
     default_detail = 'The file you are trying to upload is currently being processed. Try again later if the processing fails.'
     default_code = 'file_in_processing'
+
+
+class FileAlreadyUploadedException(RadiologoException):
+    status_code = 400
+    default_detail = 'There is already a file for the requested date at the archive. Delete the file in the archive first before trying to upload a new one.'
+    default_code = 'file_already_uploaded'

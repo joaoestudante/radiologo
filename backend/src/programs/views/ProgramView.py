@@ -68,7 +68,7 @@ class UploadProgramView(APIView):
         tasks.process_audio.delay(uploaded_file_path=settings.FILE_UPLOAD_DIR + request.data['file'].name,
                                   uploader=request.user.author_name,
                                   email=request.user.email,
-                                  program_name=program.normalized_name(),
+                                  normalized_program_name=program.normalized_name(),
                                   emission_date=request.data['date'],
                                   weekday=weekday,
                                   already_normalized=program.comes_normalized,

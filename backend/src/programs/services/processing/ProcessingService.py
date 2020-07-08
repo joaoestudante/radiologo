@@ -1,5 +1,7 @@
 import os
 from datetime import datetime
+from traceback import print_tb
+
 from django.conf import settings
 from pydub.utils import which, mediainfo
 
@@ -12,17 +14,18 @@ from radiologo.emailservice import EmailService
 
 
 class ProcessingService:
-    def __init__(self, path: str, emission_date: str, program_name: str, author_name: str, email: str, weekday: str,
+    def __init__(self, path: str, emission_date: str, normalized_program_name: str, author_name: str, email: str,
+                 weekday: str,
                  already_normalized: bool, adjust_duration: bool):
         self.uploaded_file_path = path
-        self.program_name = program_name
+        self.normalized_program_name = normalized_program_name
         self.author_name = author_name
         self.email = email
         self.weekday = weekday
         self.emission_date = emission_date
         self.already_normalized = already_normalized
         self.adjust_duration = adjust_duration
-        self.output_file_name = self.get_output_filename(emission_date, program_name, weekday)
+        self.output_file_name = self.get_output_filename(emission_date, normalized_program_name, weekday)
         self.output_file_path = os.path.dirname(self.uploaded_file_path) + "/" + self.output_file_name
 
         self.collected_problems = []
@@ -32,7 +35,8 @@ class ProcessingService:
 
         display_emission_date = emission_date[:4] + "-" + emission_date[4:6] + "-" + emission_date[6:]
         self.email_service = EmailService(
-            subject="Relatório de envio do programa {} para o dia {}".format(program_name, display_emission_date),
+            subject="Relatório de envio do programa {} para o dia {}".format(normalized_program_name,
+                                                                             display_emission_date),
             to=email)
 
         # Settings
@@ -48,7 +52,7 @@ class ProcessingService:
                      "date": ""}
 
     def process(self):
-        print("Processing started for: " + self.program_name)
+        print("Processing started for: " + self.normalized_program_name)
         try:
             AudioSegment.converter = which('ffmpeg')
             uploaded_file = AudioSegment.from_file(self.uploaded_file_path, self.uploaded_file_path[-3:])
@@ -70,20 +74,24 @@ class ProcessingService:
                                  parameters=parameters)
 
             print("\t* Uploading...")
-            self.upload_service.upload_program_to_archive(self.output_file_path)
+            self.upload_service.upload_program_to_archive(self.normalized_program_name, self.output_file_path)
+            if self.emission_date == datetime.now().strftime("%Y%m%d"):
+                self.upload_service.upload_program_to_emission(self.output_file_path)
+
             print("\t* Sending email...")
-            self.email_service.send_upload_accepted(checker=checker, program_name=self.program_name,
+            self.email_service.send_upload_accepted(checker=checker, program_name=self.normalized_program_name,
                                                     emission_date=self.emission_date)
 
         except IrrecoverableProblemsException:
             print("\t\t- File has bad problems, sending email...")
-            self.email_service.send_upload_rejected(checker=checker, program_name=self.program_name,
+            self.email_service.send_upload_rejected(checker=checker, program_name=self.normalized_program_name,
                                                     emission_date=self.emission_date)
 
         except Exception as e:
             print("- Something unexpected happened, sending email...")
             print(e)
-            self.email_service.send_upload_failed(program_name=self.program_name,
+            print_tb(e.__traceback__)
+            self.email_service.send_upload_failed(program_name=self.normalized_program_name,
                                                   emission_date=self.emission_date)
 
         finally:
@@ -99,7 +107,7 @@ class ProcessingService:
             self.tags["artist"] = self.author_name
 
         if not self.tags["album"]:
-            self.tags["album"] = self.program_name
+            self.tags["album"] = self.normalized_program_name
 
         if not self.tags["title"]:
             self.tags["title"] = self.output_file_name

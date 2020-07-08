@@ -181,3 +181,13 @@ SIMPLE_JWT = {
 
 # Celery
 CELERY_BROKER_URL='redis://redis:6379/0'
+
+# Uploads
+ARCHIVE_SERVER_IP = config.get("Servers", "ArchiveServer.ip")
+ARCHIVE_SERVER_USERNAME = config.get("Servers", "ArchiveServer.username")
+ARCHIVE_SERVER_PASSWORD = config.get("Servers", "ArchiveServer.password")
+ARCHIVE_SERVER_UPLOAD_DIRECTORY = config.get("Servers", "ArchiveServer.rootUploadDirectory")
+UPLOAD_SERVER_IP = config.get("Servers", "UploadServer.ip")
+UPLOAD_SERVER_USERNAME = config.get("Servers", "UploadServer.username")
+UPLOAD_SERVER_PASSWORD = config.get("Servers", "UploadServer.password")
+UPLOAD_SERVER_UPLOAD_DIRECTORY = config.get("Servers", "UploadServer.rootUploadDirectory")
