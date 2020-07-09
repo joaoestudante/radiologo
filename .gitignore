@@ -132,3 +132,5 @@ dmypy.json
 application.properties
 .idea/
 /backend/src/keys/generated/
+/backend/src/radiologo/resources/keys_templates/keydoc.md
+/backend/src/radiologo/resources/keys_templates/rz_banner.png
