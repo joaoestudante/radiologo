@@ -1,6 +1,7 @@
 import json
 from datetime import datetime
 
+import paramiko
 from django.conf import settings
 from django.core.validators import URLValidator
 from django.core.exceptions import ValidationError
@@ -131,3 +132,9 @@ class DownloadProgramView(APIView):
     def get(self, request, pk, date):
         program = get_object_or_404(Program, pk=pk)
         return RemoteService().download_archive_file(program.normalized_name(), date)
+
+class GetArchiveContentsView(APIView):
+    def get(self, request, pk):
+        program = get_object_or_404(Program, pk=pk)
+        file_list = RemoteService().get_archive_contents(program.normalized_name())
+        return Response(status=status.HTTP_200_OK, data=json.dumps(file_list))

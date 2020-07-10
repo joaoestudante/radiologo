@@ -1,4 +1,5 @@
 import os
+import re
 from datetime import datetime
 
 import paramiko
@@ -77,3 +78,29 @@ class RemoteService:
         resp['Content-Type'] = 'audio/mpeg'
 
         return resp
+
+    def get_archive_contents(self, normalized_program_name):
+        destination = "/srv/arquivo_sonoro/radiologo/"
+        file_list = {}
+
+        ssh_client = paramiko.SSHClient()
+        ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        ssh_client.connect(hostname=settings.ARCHIVE_SERVER_IP, username=settings.ARCHIVE_SERVER_USERNAME,
+                           password=settings.ARCHIVE_SERVER_PASSWORD)
+
+        ftp_client = ssh_client.open_sftp()
+
+        try:
+            ftp_client.chdir(destination + normalized_program_name)
+            for file_name in ftp_client.listdir():
+                compact_date = re.findall('\d{8,9}', file_name)[0]
+                display_date = datetime.strptime(compact_date[:8], "%Y%m%d").strftime("%d/%m/%Y")
+                file_list[display_date] = {
+                    "file_date": compact_date,
+                    "file_name": file_name}
+            file_list = sorted(file_list.items(), key=lambda k: k[1]['file_date'], reverse=True)
+
+        except IOError as e:
+            pass
+        finally:
+            return file_list
