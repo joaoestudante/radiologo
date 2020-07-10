@@ -1,6 +1,6 @@
 import os
 import re
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import paramiko
 import requests
@@ -9,6 +9,9 @@ from django.http import StreamingHttpResponse
 
 from exceptions.radiologoexception import FileAlreadyUploadedException, FileNotDeletedException, \
     FileDoesNotExistException
+from programs.models import Program
+
+import collections
 
 
 class RemoteService:
@@ -29,7 +32,7 @@ class RemoteService:
             if file is not None:
                 raise FileAlreadyUploadedException
         except IOError:
-            pass # Success
+            pass  # Success
 
         return ftp_client
 
@@ -132,3 +135,41 @@ class RemoteService:
             pass  # Success
 
         return
+
+    def get_archive_stats(self):
+        # Uploaded/not uploaded in the latest 7 days
+        ssh_client = paramiko.SSHClient()
+        ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        ssh_client.connect(hostname=settings.ARCHIVE_SERVER_IP, username=settings.ARCHIVE_SERVER_USERNAME,
+                           password=settings.ARCHIVE_SERVER_PASSWORD)
+
+        ftp_client = ssh_client.open_sftp()
+        ftp_client.chdir(settings.ARCHIVE_SERVER_UPLOAD_DIRECTORY)
+
+        stats = collections.defaultdict(self._default_stat_dict)
+
+        active_programs = Program.objects.filter(state='A')
+        for program in active_programs:
+            for i in range(8):
+                iteration_date = datetime.now() - timedelta(days=i)
+                if iteration_date.isoweekday() in program.enabled_days:  # check if there is an upload for this day
+                    try:
+                        ftp_client.chdir(program.normalized_name())
+                    except IOError: # never uploaded
+                        pass # we can ignore... stats are properly updated anyway
+                    self._update_stats_dict(stats, program, iteration_date, ftp_client)
+                    ftp_client.chdir("..")
+        return stats
+
+
+    @staticmethod
+    def _default_stat_dict():
+        return {"uploaded": [], "not_uploaded": []}
+
+    def _update_stats_dict(self, stats, current_program, iteration_date, ftp_client):
+        if current_program.get_filename_for_date(iteration_date.strftime("%Y%m%d")) in ftp_client.listdir():
+            stats[iteration_date.strftime("%Y-%m-%d")]["uploaded"].append(
+                (current_program.pk, current_program.normalized_name()))
+        else:
+            stats[iteration_date.strftime("%Y-%m-%d")]["not_uploaded"].append(
+                (current_program.pk, current_program.normalized_name()))

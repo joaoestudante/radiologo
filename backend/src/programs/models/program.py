@@ -4,7 +4,7 @@ from django.db import models
 from django.contrib.auth import get_user_model
 from django.utils import timezone
 from unidecode import unidecode
-from datetime import datetime, timedelta, date
+from datetime import timedelta, date
 
 DURATIONS = (
     (28, '28'),
@@ -34,7 +34,7 @@ class Program(models.Model):
                                                                "automaticamente, selecciona esta opção.")
     is_external = models.BooleanField(default=False)
     state = models.CharField(verbose_name="Estado", choices=STATES, default="A", max_length=15)
-    rss_feed_status = models.BooleanField(verbose_name="Status do upload automático com Feed RSS",default=False)
+    rss_feed_status = models.BooleanField(verbose_name="Status do upload automático com Feed RSS", default=False)
     rss_feed_url = models.CharField(max_length=1024, verbose_name="Endereço do Feed RSS", default="")
 
     def __str__(self):
@@ -65,6 +65,10 @@ class Program(models.Model):
         if current_iso_weekday in self.enabled_days:
             return current_day.isoformat()
         else:
-            for i in range(1,7):
+            for i in range(1, 7):
                 if (current_day + timedelta(days=i)).isoweekday() in self.enabled_days:
                     return (current_day + timedelta(days=i)).isoformat()
+
+    def get_filename_for_date(self, date: str):
+        from programs.services.ProgramService import ProgramService
+        return self.normalized_name() + date + ProgramService().get_weekday_for_date(self.slot_set, self.enabled_days, date) + ".mp3"

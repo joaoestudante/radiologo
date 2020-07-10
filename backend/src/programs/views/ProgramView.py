@@ -19,6 +19,7 @@ from ..serializers.ProgramSerializer import ProgramSerializer
 from ..models.program import Program
 from django.shortcuts import get_object_or_404
 
+from ..services.ProgramService import ProgramService
 from ..services.RemoteService import RemoteService
 from ..services.processing.ProcessingService import ProcessingService
 
@@ -61,8 +62,7 @@ class UploadProgramView(APIView):
 
     def put(self, request, pk):
         program = Program.objects.get(pk=pk)
-        emission_slots = list(program.slot_set.all())
-        weekday = self.get_emission_weekday(emission_slots, program, request)
+        weekday = ProgramService().get_weekday_for_date(program.slot_set, program.enabled_days, request.data['date'])
 
         ProcessingService.save_file(uploaded_file=request.data['file'], program_name=program.normalized_name(),
                                     emission_date=request.data['date'], weekday=weekday)
@@ -78,21 +78,6 @@ class UploadProgramView(APIView):
 
         return Response(status=status.HTTP_200_OK, data=json.dumps({"Nice": "Nice"}))
 
-    def get_emission_weekday(self, emission_slots, program, request):
-        try:
-            emission_date_obj = datetime.strptime(request.data['date'], "%Y%m%d")
-        except ValueError:
-            raise InvalidDateFormatForEmissionException
-        if len(emission_slots) > 1:
-            isoweekday = emission_date_obj.isoweekday()
-            if isoweekday not in program.enabled_days:
-                raise InvalidDateForEmissionException
-
-            weekday = program.slot_set.filter(weekday=Slot.iso_to_custom_format(isoweekday))[
-                0].weekday
-        else:
-            weekday = ""
-        return weekday
 
 class GetUpdateDeleteRSSView(APIView):
     def get(self, request, pk):
@@ -144,3 +129,8 @@ class GetArchiveContentsView(APIView):
         program = get_object_or_404(Program, pk=pk)
         file_list = RemoteService().get_archive_contents(program.normalized_name())
         return Response(status=status.HTTP_200_OK, data=json.dumps(file_list))
+
+class GetArchiveStatistics(APIView):
+    def get(self, request):
+        stats = RemoteService().get_archive_stats()
+        return Response(status=status.HTTP_200_OK, data=json.dumps(stats))
