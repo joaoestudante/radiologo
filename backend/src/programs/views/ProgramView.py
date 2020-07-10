@@ -134,3 +134,9 @@ class GetArchiveStatistics(APIView):
     def get(self, request):
         stats = RemoteService().get_archive_stats()
         return Response(status=status.HTTP_200_OK, data=json.dumps(stats))
+
+class GetProgramAlreadyUploadedDates(APIView):
+    def get(self, request, pk):
+        program = Program.objects.get(pk=pk)
+        dates = RemoteService().get_uploaded_dates(program)
+        return Response(status=status.HTTP_200_OK, data=json.dumps(dates))

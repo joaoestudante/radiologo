@@ -172,3 +172,28 @@ class RemoteService:
         else:
             stats[iteration_date.strftime("%Y-%m-%d")]["not_uploaded"].append(
                 (current_program.pk, current_program.normalized_name()))
+
+    def get_uploaded_dates(self, program: Program):
+        ssh_client = paramiko.SSHClient()
+        ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        ssh_client.connect(hostname=settings.ARCHIVE_SERVER_IP, username=settings.ARCHIVE_SERVER_USERNAME,
+                           password=settings.ARCHIVE_SERVER_PASSWORD)
+
+        ftp_client = ssh_client.open_sftp()
+        try:
+            ftp_client.chdir(settings.ARCHIVE_SERVER_UPLOAD_DIRECTORY + program.normalized_name())
+        except IOError:
+            return []
+
+        files = ftp_client.listdir()
+        ftp_client.close()
+
+        dates = []
+        for file in files:
+            date_weekday = file[:-4].replace(program.normalized_name(), "")
+            if len(date_weekday) == 9: # has weekday
+                without_weekday = date_weekday[:-1]
+                dates.append(without_weekday[:4] + "-" + without_weekday[4:6] + "-" + without_weekday[6:])
+            else:
+                dates.append(date_weekday[:4] + "-" + date_weekday[4:6] + "-" + date_weekday[6:])
+        return dates
