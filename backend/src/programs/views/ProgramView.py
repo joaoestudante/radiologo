@@ -1,6 +1,7 @@
 import json
 from datetime import datetime
 
+import paramiko
 from django.conf import settings
 from django.core.validators import URLValidator
 from django.core.exceptions import ValidationError
@@ -18,6 +19,8 @@ from ..serializers.ProgramSerializer import ProgramSerializer
 from ..models.program import Program
 from django.shortcuts import get_object_or_404
 
+from ..services.ProgramService import ProgramService
+from ..services.RemoteService import RemoteService
 from ..services.processing.ProcessingService import ProcessingService
 
 
@@ -59,52 +62,32 @@ class UploadProgramView(APIView):
 
     def put(self, request, pk):
         program = Program.objects.get(pk=pk)
-        emission_slots = list(program.slot_set.all())
-        weekday = self.get_emission_weekday(emission_slots, program, request)
 
-        ProcessingService.save_file(uploaded_file=request.data['file'], program_name=program.normalized_name(),
-                                    emission_date=request.data['date'], weekday=weekday)
+        ProcessingService.save_file(uploaded_file=request.data['file'], emission_date=request.data['date'], program=program)
 
         tasks.process_audio.delay(uploaded_file_path=settings.FILE_UPLOAD_DIR + request.data['file'].name,
+                                  program_pk = program.pk,
                                   uploader=request.user.author_name,
                                   email=request.user.email,
-                                  normalized_program_name=program.normalized_name(),
-                                  emission_date=request.data['date'],
-                                  weekday=weekday,
-                                  already_normalized=program.comes_normalized,
-                                  adjust_duration=not program.ignore_duration_adjustment)
+                                  emission_date=request.data['date'])
 
-        return Response(status=status.HTTP_200_OK, data=json.dumps({"Nice": "Nice"}))
+        return Response(status=status.HTTP_200_OK)
 
-    def get_emission_weekday(self, emission_slots, program, request):
-        try:
-            emission_date_obj = datetime.strptime(request.data['date'], "%Y%m%d")
-        except ValueError:
-            raise InvalidDateFormatForEmissionException
-        if len(emission_slots) > 1:
-            isoweekday = emission_date_obj.isoweekday()
-            if isoweekday not in program.enabled_days:
-                raise InvalidDateForEmissionException
-
-            weekday = program.slot_set.filter(weekday=Slot.iso_to_custom_format(isoweekday))[
-                0].weekday
-        else:
-            weekday = ""
-        return weekday
 
 class GetUpdateDeleteRSSView(APIView):
     def get(self, request, pk):
         program = get_object_or_404(Program, pk=pk)
         rss_feed_url = program.rss_feed_url
         rss_status = program.rss_feed_status
-        return Response(status=status.HTTP_200_OK, data=json.dumps({'feed_url':rss_feed_url, 'feed_status':rss_status}))
+        return Response(status=status.HTTP_200_OK,
+                        data=json.dumps({'feed_url': rss_feed_url, 'feed_status': rss_status}))
 
     def patch(self, request, pk):
         program = get_object_or_404(Program, pk=pk)
-        #Current values
+        # Current values
         current_url = program.rss_feed_url
         current_status = program.rss_feed_status
-        #Check new values
+        # Check new values
         new_url = request.data['feed_url']
         new_status = request.data['feed_status']
         try:
@@ -118,11 +101,42 @@ class GetUpdateDeleteRSSView(APIView):
 
         program.rss_feed_url = new_url
         program.rss_feed_status = new_status
-        return Response(status=status.HTTP_201_CREATED, data=json.dumps({'feed_url': program.rss_feed_url, 'feed_status': program.rss_feed_status}))
+        return Response(status=status.HTTP_201_CREATED,
+                        data=json.dumps({'feed_url': program.rss_feed_url, 'feed_status': program.rss_feed_status}))
 
     def delete(self, request, pk):
         program = get_object_or_404(Program, pk=pk)
         program.rss_feed_url = ""
         program.rss_feed_status = False
+        program.save()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
+
+class GetDeleteArchiveProgramView(APIView):
+    def get(self, request, pk, date):
+        program = get_object_or_404(Program, pk=pk)
+        return RemoteService().download_archive_file(program, date)
+
+    def delete(self, request, pk, date):
+        program = get_object_or_404(Program, pk=pk)
+        RemoteService().delete_archive_file(program, date)
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class GetArchiveContentsView(APIView):
+    def get(self, request, pk):
+        program = get_object_or_404(Program, pk=pk)
+        file_list = RemoteService().get_archive_contents(program.normalized_name())
+        return Response(status=status.HTTP_200_OK, data=json.dumps(file_list))
+
+
+class GetArchiveStatistics(APIView):
+    def get(self, request):
+        stats = RemoteService().get_archive_stats()
+        return Response(status=status.HTTP_200_OK, data=json.dumps(stats))
+
+class GetProgramAlreadyUploadedDates(APIView):
+    def get(self, request, pk):
+        program = Program.objects.get(pk=pk)
+        dates = RemoteService().get_uploaded_dates(program)
+        return Response(status=status.HTTP_200_OK, data=json.dumps(dates))

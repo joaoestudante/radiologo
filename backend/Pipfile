@@ -18,6 +18,7 @@ flower = "*"
 pydub = "*"
 feedparser = "*"
 paramiko = "*"
+requests = "*"
 
 [requires]
 python_version = "3.8"

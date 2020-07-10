@@ -8,34 +8,33 @@ from pydub.utils import which, mediainfo
 from exceptions.radiologoexception import FileBeingProcessedException
 from pydub import AudioSegment
 
-from programs.services.UploadService import UploadService
+from programs.models import Program
+from programs.services.RemoteService import RemoteService
 from programs.services.processing.FileChecker import FileChecker, IrrecoverableProblemsException
 from radiologo.emailservice import EmailService
 
 
 class ProcessingService:
-    def __init__(self, path: str, emission_date: str, normalized_program_name: str, author_name: str, email: str,
-                 weekday: str,
-                 already_normalized: bool, adjust_duration: bool):
+    def __init__(self, path: str, program_pk: int, emission_date: str, author_name: str, email: str):
         self.uploaded_file_path = path
-        self.normalized_program_name = normalized_program_name
+        self.program = Program.objects.get(pk=program_pk)
+        self.normalized_program_name = self.program.normalized_name()
         self.author_name = author_name
         self.email = email
-        self.weekday = weekday
         self.emission_date = emission_date
-        self.already_normalized = already_normalized
-        self.adjust_duration = adjust_duration
-        self.output_file_name = self.get_output_filename(emission_date, normalized_program_name, weekday)
+        self.already_normalized = self.program.comes_normalized
+        self.adjust_duration = not self.program.ignore_duration_adjustment
+        self.output_file_name = self.program.get_filename_for_date(emission_date)
         self.output_file_path = os.path.dirname(self.uploaded_file_path) + "/" + self.output_file_name
 
         self.collected_problems = []
         self.collected_warnings = []
 
-        self.upload_service = UploadService()
+        self.remote_service = RemoteService()
 
         display_emission_date = emission_date[:4] + "-" + emission_date[4:6] + "-" + emission_date[6:]
         self.email_service = EmailService(
-            subject="Relatório de envio do programa {} para o dia {}".format(normalized_program_name,
+            subject="Relatório de envio do programa {} para o dia {}".format(self.normalized_program_name,
                                                                              display_emission_date),
             to=email)
 
@@ -74,9 +73,9 @@ class ProcessingService:
                                  parameters=parameters)
 
             print("\t* Uploading...")
-            self.upload_service.upload_program_to_archive(self.normalized_program_name, self.output_file_path)
+            self.remote_service.upload_program_to_archive(self.normalized_program_name, self.output_file_path)
             if self.emission_date == datetime.now().strftime("%Y%m%d"):
-                self.upload_service.upload_program_to_emission(self.output_file_path)
+                self.remote_service.upload_program_to_emission(self.output_file_path)
 
             print("\t* Sending email...")
             self.email_service.send_upload_accepted(checker=checker, program_name=self.normalized_program_name,
@@ -116,21 +115,16 @@ class ProcessingService:
             self.tags["date"] = datetime.now().strftime("%Y")
 
     @staticmethod
-    def get_output_filename(emission_date, program_name, weekday):
-        return program_name + emission_date + str(weekday) + ".mp3"
-
-    @staticmethod
-    def save_file(uploaded_file, emission_date, program_name, weekday):
+    def save_file(uploaded_file, emission_date: str, program: Program):
         uploaded_file.name = "uploaded_" + uploaded_file.name
         uploaded_file_path = settings.FILE_UPLOAD_DIR + uploaded_file.name
-        output_file_path = settings.FILE_UPLOAD_DIR + ProcessingService.get_output_filename(emission_date, program_name,
-                                                                                            weekday)
+        output_file_path = settings.FILE_UPLOAD_DIR + program.get_filename_for_date(emission_date)
 
         if os.path.isfile(uploaded_file_path) or os.path.isfile(output_file_path):
             raise FileBeingProcessedException
 
-        upload_service = UploadService()
-        upload_service.check_file_for_date(program_name, emission_date)
+        upload_service = RemoteService()
+        upload_service.check_file_for_date(program.normalized_name(), emission_date)
 
         with open(uploaded_file_path, 'wb+') as destination:
             for chunk in uploaded_file.chunks():
