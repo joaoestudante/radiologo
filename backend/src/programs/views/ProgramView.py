@@ -128,10 +128,15 @@ class GetUpdateDeleteRSSView(APIView):
         program.rss_feed_status = False
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-class DownloadProgramView(APIView):
+class GetDeleteArchiveProgramView(APIView):
     def get(self, request, pk, date):
         program = get_object_or_404(Program, pk=pk)
         return RemoteService().download_archive_file(program.normalized_name(), date)
+
+    def delete(self, request, pk, date):
+        program = get_object_or_404(Program, pk=pk)
+        RemoteService().delete_archive_file(program.normalized_name(), date)
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 class GetArchiveContentsView(APIView):
     def get(self, request, pk):

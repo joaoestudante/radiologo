@@ -7,14 +7,15 @@ import requests
 from django.conf import settings
 from django.http import StreamingHttpResponse
 
-from exceptions.radiologoexception import FileAlreadyUploadedException
+from exceptions.radiologoexception import FileAlreadyUploadedException, FileNotDeletedException, \
+    FileDoesNotExistException
 
 
 class RemoteService:
     def __init__(self):
         pass
 
-    def check_file_for_date(self, program, emission_date):
+    def check_file_for_date(self, program, emission_date):  # emission_date is YYYYMMDD
         potential_file = settings.ARCHIVE_SERVER_UPLOAD_DIRECTORY + program + "/" + emission_date + "*"
 
         ssh_client = paramiko.SSHClient()
@@ -27,7 +28,7 @@ class RemoteService:
             ftp_client.stat(potential_file)
         except IOError:
             raise FileAlreadyUploadedException
-        return
+        return ftp_client
 
     def upload_program_to_archive(self, normalized_program_name, file_path):
         archive_folder = settings.ARCHIVE_SERVER_UPLOAD_DIRECTORY + normalized_program_name + "/"
@@ -104,3 +105,27 @@ class RemoteService:
             pass
         finally:
             return file_list
+
+    def delete_archive_file(self, normalized_program_name, date):  # date is YYYYMMDDw (where w=weekday and is optional)
+        file = settings.ARCHIVE_SERVER_UPLOAD_DIRECTORY + normalized_program_name + "/" + normalized_program_name + \
+               date + ".mp3"
+
+        ssh_client = paramiko.SSHClient()
+        ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        ssh_client.connect(hostname=settings.ARCHIVE_SERVER_IP, username=settings.ARCHIVE_SERVER_USERNAME,
+                           password=settings.ARCHIVE_SERVER_PASSWORD)
+
+        ftp_client = ssh_client.open_sftp()
+
+        try:
+            ftp_client.remove(file)
+        except IOError:
+            raise FileDoesNotExistException
+
+        try:
+            ftp_client.stat(file)
+            raise FileNotDeletedException
+        except IOError:
+            pass  # Success
+
+        return
