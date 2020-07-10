@@ -71,4 +71,7 @@ class Program(models.Model):
 
     def get_filename_for_date(self, date: str):
         from programs.services.ProgramService import ProgramService
-        return self.normalized_name() + date + ProgramService().get_weekday_for_date(self.slot_set, self.enabled_days, date) + ".mp3"
+        if(len(date) == 9): # includes weekday
+            return self.normalized_name() + date  + ".mp3"
+        else:
+            return self.normalized_name() + date + ProgramService().get_weekday_for_date(self.slot_set, self.enabled_days, date) + ".mp3"

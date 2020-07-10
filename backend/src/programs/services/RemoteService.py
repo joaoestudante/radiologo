@@ -69,14 +69,14 @@ class RemoteService:
         ftp_client.close()
         return
 
-    def download_archive_file(self, normalized_program_name, emission_date):
-        filename = normalized_program_name + emission_date + ".mp3"
+    def download_archive_file(self, program:Program, emission_date:str):
+        filename = program.get_filename_for_date(emission_date)
         archive_url = "http://{}".format(settings.ARCHIVE_SERVER_IP)
         session = requests.Session()
         session.auth = (settings.ARCHIVE_SERVER_USERNAME, settings.ARCHIVE_SERVER_PASSWORD)
         session.post(archive_url)
 
-        r = session.get(archive_url + '/archive/' + normalized_program_name + "/" + filename, stream=True)
+        r = session.get(archive_url + '/archive/' + program.normalized_name() + "/" + filename, stream=True)
 
         resp = StreamingHttpResponse(r.iter_content(8096))
         resp['headers'] = "X-Accel-Redirect"
@@ -112,9 +112,8 @@ class RemoteService:
         finally:
             return file_list
 
-    def delete_archive_file(self, normalized_program_name, date):  # date is YYYYMMDDw (where w=weekday and is optional)
-        file = settings.ARCHIVE_SERVER_UPLOAD_DIRECTORY + normalized_program_name + "/" + normalized_program_name + \
-               date + ".mp3"
+    def delete_archive_file(self, program, date):  # date is YYYYMMDDw (where w=weekday and is optional)
+        file = settings.ARCHIVE_SERVER_UPLOAD_DIRECTORY + program.normalized_name() + "/" + program.get_filename_for_date(date)
 
         ssh_client = paramiko.SSHClient()
         ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
