@@ -18,6 +18,7 @@ from ..serializers.ProgramSerializer import ProgramSerializer
 from ..models.program import Program
 from django.shortcuts import get_object_or_404
 
+from ..services.RemoteService import RemoteService
 from ..services.processing.ProcessingService import ProcessingService
 
 
@@ -126,3 +127,7 @@ class GetUpdateDeleteRSSView(APIView):
         program.rss_feed_status = False
         return Response(status=status.HTTP_204_NO_CONTENT)
 
+class DownloadProgramView(APIView):
+    def get(self, request, pk, date):
+        program = get_object_or_404(Program, pk=pk)
+        return RemoteService().download_archive_file(program.normalized_name(), date)

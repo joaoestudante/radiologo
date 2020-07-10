@@ -8,7 +8,7 @@ from pydub.utils import which, mediainfo
 from exceptions.radiologoexception import FileBeingProcessedException
 from pydub import AudioSegment
 
-from programs.services.UploadService import UploadService
+from programs.services.RemoteService import RemoteService
 from programs.services.processing.FileChecker import FileChecker, IrrecoverableProblemsException
 from radiologo.emailservice import EmailService
 
@@ -31,7 +31,7 @@ class ProcessingService:
         self.collected_problems = []
         self.collected_warnings = []
 
-        self.upload_service = UploadService()
+        self.remote_service = RemoteService()
 
         display_emission_date = emission_date[:4] + "-" + emission_date[4:6] + "-" + emission_date[6:]
         self.email_service = EmailService(
@@ -74,9 +74,9 @@ class ProcessingService:
                                  parameters=parameters)
 
             print("\t* Uploading...")
-            self.upload_service.upload_program_to_archive(self.normalized_program_name, self.output_file_path)
+            self.remote_service.upload_program_to_archive(self.normalized_program_name, self.output_file_path)
             if self.emission_date == datetime.now().strftime("%Y%m%d"):
-                self.upload_service.upload_program_to_emission(self.output_file_path)
+                self.remote_service.upload_program_to_emission(self.output_file_path)
 
             print("\t* Sending email...")
             self.email_service.send_upload_accepted(checker=checker, program_name=self.normalized_program_name,
@@ -129,7 +129,7 @@ class ProcessingService:
         if os.path.isfile(uploaded_file_path) or os.path.isfile(output_file_path):
             raise FileBeingProcessedException
 
-        upload_service = UploadService()
+        upload_service = RemoteService()
         upload_service.check_file_for_date(program_name, emission_date)
 
         with open(uploaded_file_path, 'wb+') as destination:

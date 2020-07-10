@@ -2,12 +2,14 @@ import os
 from datetime import datetime
 
 import paramiko
+import requests
 from django.conf import settings
+from django.http import StreamingHttpResponse
 
 from exceptions.radiologoexception import FileAlreadyUploadedException
 
 
-class UploadService:
+class RemoteService:
     def __init__(self):
         pass
 
@@ -58,3 +60,20 @@ class UploadService:
         ftp_client.put(file_path, emission_file_path)
         ftp_client.close()
         return
+
+    def download_archive_file(self, normalized_program_name, emission_date):
+        filename = normalized_program_name + emission_date + ".mp3"
+        archive_url = "http://{}".format(settings.ARCHIVE_SERVER_IP)
+        session = requests.Session()
+        session.auth = (settings.ARCHIVE_SERVER_USERNAME, settings.ARCHIVE_SERVER_PASSWORD)
+        session.post(archive_url)
+
+        r = session.get(archive_url + '/archive/' + normalized_program_name + "/" + filename, stream=True)
+
+        resp = StreamingHttpResponse(r.iter_content(8096))
+        resp['headers'] = "X-Accel-Redirect"
+        resp['Content-Disposition'] = 'attachment; filename={}'.format(filename)
+        resp['Accept-Ranges'] = 'bytes'
+        resp['Content-Type'] = 'audio/mpeg'
+
+        return resp
