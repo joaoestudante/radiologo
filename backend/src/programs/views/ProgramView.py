@@ -126,6 +126,7 @@ class GetUpdateDeleteRSSView(APIView):
         program = get_object_or_404(Program, pk=pk)
         program.rss_feed_url = ""
         program.rss_feed_status = False
+        program.save()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 class GetDeleteArchiveProgramView(APIView):

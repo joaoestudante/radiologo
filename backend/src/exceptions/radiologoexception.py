@@ -70,10 +70,12 @@ class FileAlreadyUploadedException(RadiologoException):
     default_detail = 'There is already a file for the requested date at the archive. Delete the file in the archive first before trying to upload a new one.'
     default_code = 'file_already_uploaded'
 
+
 class FileNotDeletedException(RadiologoException):
     status_code = 400
     default_detail = 'The file could not be deleted in the archive due to an unknown problem. Contact us to request a manual file deletion.'
     default_code = 'file_not_deleted'
+
 
 class FileDoesNotExistException(RadiologoException):
     status_code = 400
