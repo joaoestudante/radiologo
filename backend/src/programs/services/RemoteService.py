@@ -16,7 +16,7 @@ class RemoteService:
         pass
 
     def check_file_for_date(self, program, emission_date):  # emission_date is YYYYMMDD
-        potential_file = settings.ARCHIVE_SERVER_UPLOAD_DIRECTORY + program + "/" + emission_date + "*"
+        potential_file = settings.ARCHIVE_SERVER_UPLOAD_DIRECTORY + program + "/" + program + emission_date + "*"
 
         ssh_client = paramiko.SSHClient()
         ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
@@ -25,9 +25,12 @@ class RemoteService:
 
         ftp_client = ssh_client.open_sftp()
         try:
-            ftp_client.stat(potential_file)
+            file = ftp_client.stat(potential_file)
+            if file is not None:
+                raise FileAlreadyUploadedException
         except IOError:
-            raise FileAlreadyUploadedException
+            pass # Success
+
         return ftp_client
 
     def upload_program_to_archive(self, normalized_program_name, file_path):
