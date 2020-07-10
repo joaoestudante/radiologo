@@ -1,3 +1,8 @@
+from programs.models import Program
+from programs.services.processing.ProcessingService import ProcessingService
+
+from django.conf import settings
+
 import feedparser
 import requests
 from django.conf import settings
@@ -8,10 +13,14 @@ from collections import namedtuple  # builtin
 from operator import attrgetter  # builtin
 from time import struct_time
 
-class RSSRetriever:
+class FeedService:
 
-    def __init__(self, url):
-        self.feed_url = url
+    def __init__(self, program_pk):
+        self.program_pk = program_pk
+        self.program =  Program.objects.get(pk=self.program_pk)
+        self.normalized_program_name = self.program.normalized_name()
+        self.feed_url = self.program.rss_feed_url
+        self.feed_status = self.program.rss_feed_status
         self.name = ""
         self.episodeList = []
 
@@ -37,13 +46,13 @@ class RSSRetriever:
             # duration was specified in hours:minutes:seconds
             return timedelta(hours=int(groupings[0]), minutes=int(groupings[1]), seconds=int(groupings[2]))
 
-    def list_episodes_in_podcast(self, feedurl) -> tuple:
+    def list_episodes_in_podcast(self) -> tuple:
         """ Retrieve a list of episodes at the podcast feed
         located in _feedurl_.
         RETURNS [Episode] as list of Episode, podcastname as str"""
 
         # Download and parse feed
-        parsed = feedparser.parse(feedurl)
+        parsed = feedparser.parse(self.feed_url)
 
         self.name = parsed.feed.title
 
@@ -85,18 +94,21 @@ class RSSRetriever:
 
         return destpath
 
-    def download_last_episode(self, normalized_name):
+    def download_last_episode(self):
         """Automatically download last episode"""
-        episodes, podcastname = self.list_episodes_in_podcast(self.feed_url)
-        destpath = self.download_episode(settings.FILE_UPLOAD_DIR + "uploaded_feed_" + normalized_name, episodes[0])
-        # Introduce a function that hands over to processing here
-        # e.g. ProcessFile(destpath_ext)
-        # Introduce a function that notifies
-        # the Programming department by email of successful upload
-        # with information of episode name and its date
-        # e.g. SendEmail(episodes[0].title, episodes[0].date)
-        # Cleanup the file
-        os.remove(destpath)
+        if self.feed_status == True:
+            # Retrieve Episode List
+            episodes, podcastname = self.list_episodes_in_podcast(self.feed_url)
+            # Download last episode
+            destpath = self.download_episode(settings.FILE_UPLOAD_DIR + "uploaded_feed_" + self.normalized_program_name, episodes[0])
+            # Process the file
+            service = ProcessingService(path=destpath, program_pk=self.program_pk, emission_date=episodes[0].date,
+                                author_name=self.name, email=settings.ADMIN_EMAIL)
+            # For code review: is it OK if the emission date is not correct? Will it assume the next available date or do I need to compute it?
+            service.process()
+        else:
+            print("\t\t- Automatic RSS Feed Upload for "+ self.normalized_program_name + " is disabled, continuing...")
+        return True
 
 # Tests
 
