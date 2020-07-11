@@ -2,7 +2,7 @@ from programs.models import Program
 from programs.services.processing.ProcessingService import ProcessingService
 
 from django.conf import settings
-
+from dataclasses import dataclass
 import feedparser
 import requests
 import re  
@@ -136,11 +136,13 @@ class FeedService:
 
 # downloadEpisode('test', episodelist[0])
 
-class Link(namedtuple):
+@dataclass
+class Link:
     href: str
     type: str
 
-class Episode(namedtuple):
+@dataclass
+class Episode:
     title: str
     duration: timedelta
     date: struct_time
