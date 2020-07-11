@@ -1,5 +1,6 @@
 import os
 import re
+import subprocess
 from datetime import datetime, timedelta
 
 import paramiko
@@ -16,7 +17,8 @@ import collections
 
 class RemoteService:
     def __init__(self):
-        pass
+        self.ssh_client = None
+        self.ftp_client = None
 
     def check_file_for_date(self, program, emission_date):  # emission_date is YYYYMMDD
         potential_file = settings.ARCHIVE_SERVER_UPLOAD_DIRECTORY + program + "/" + program + emission_date + "*"
@@ -69,7 +71,7 @@ class RemoteService:
         ftp_client.close()
         return
 
-    def download_archive_file(self, program:Program, emission_date:str):
+    def download_archive_file(self, program: Program, emission_date: str):
         filename = program.get_filename_for_date(emission_date)
         archive_url = "http://{}".format(settings.ARCHIVE_SERVER_IP)
         session = requests.Session()
@@ -113,7 +115,8 @@ class RemoteService:
             return file_list
 
     def delete_archive_file(self, program, date):  # date is YYYYMMDDw (where w=weekday and is optional)
-        file = settings.ARCHIVE_SERVER_UPLOAD_DIRECTORY + program.normalized_name() + "/" + program.get_filename_for_date(date)
+        file = settings.ARCHIVE_SERVER_UPLOAD_DIRECTORY + program.normalized_name() + "/" + program.get_filename_for_date(
+            date)
 
         ssh_client = paramiko.SSHClient()
         ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
@@ -154,12 +157,11 @@ class RemoteService:
                 if iteration_date.isoweekday() in program.enabled_days:  # check if there is an upload for this day
                     try:
                         ftp_client.chdir(program.normalized_name())
-                    except IOError: # never uploaded
-                        pass # we can ignore... stats are properly updated anyway
+                    except IOError:  # never uploaded
+                        pass  # we can ignore... stats are properly updated anyway
                     self._update_stats_dict(stats, program, iteration_date, ftp_client)
                     ftp_client.chdir("..")
         return stats
-
 
     @staticmethod
     def _default_stat_dict():
@@ -191,9 +193,24 @@ class RemoteService:
         dates = []
         for file in files:
             date_weekday = file[:-4].replace(program.normalized_name(), "")
-            if len(date_weekday) == 9: # has weekday
+            if len(date_weekday) == 9:  # has weekday
                 without_weekday = date_weekday[:-1]
                 dates.append(without_weekday[:4] + "-" + without_weekday[4:6] + "-" + without_weekday[6:])
             else:
                 dates.append(date_weekday[:4] + "-" + date_weekday[4:6] + "-" + date_weekday[6:])
         return dates
+
+    def move_from_archive_to_emission(self, program, date: datetime.date):
+        source = settings.ARCHIVE_SERVER_UPLOAD_DIRECTORY + program.normalized_name() + "/" + program.get_filename_for_date(
+            date.strftime("%Y%m%d"))
+
+        # Replacement is for scp
+        destination = "\"\'" + settings.UPLOAD_SERVER_UPLOAD_DIRECTORY + program.get_filename_for_date(
+            date.strftime("%Y%m%d")).replace(date.strftime("%Y%m%d"), "") + "\'\""
+
+        # command may error if there is no upload, but we don't care
+        command = "scp,{}@{}:{},{}@{}:{}".format(settings.ARCHIVE_SERVER_USERNAME, settings.ARCHIVE_SERVER_IP, source,
+                                                 settings.UPLOAD_SERVER_USERNAME, settings.UPLOAD_SERVER_IP,
+                                                 destination)
+        print("Running:" + command)
+        subprocess.run(command.split(","))

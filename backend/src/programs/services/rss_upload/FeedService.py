@@ -103,7 +103,7 @@ class FeedService:
         if self.feed_status == True and current_day == upload_day: # REQUIRES daily scheduled running
             print("\t\t- Automatic RSS Feed Upload for "+ self.normalized_program_name)
             # Retrieve Episode List
-            episodes, podcastname = self.list_episodes_in_podcast(self.feed_url)
+            episodes, podcastname = self.list_episodes_in_podcast()
             print("\t\t- Podcast name: "+ self.name)
             # Download last episode
             destpath = self.download_episode(settings.FILE_UPLOAD_DIR + "uploaded_feed_" + self.normalized_program_name, episodes[0])
