@@ -98,16 +98,17 @@ class FeedService:
     def download_last_episode(self):
         """Automatically download last episode"""
         if self.feed_status == True:
+            print("\t\t- Automatic RSS Feed Upload for "+ self.normalized_program_name)
             # Retrieve Episode List
             episodes, podcastname = self.list_episodes_in_podcast(self.feed_url)
+            print("\t\t- Podcast name: "+ self.name)
             # Download last episode
             destpath = self.download_episode(settings.FILE_UPLOAD_DIR + "uploaded_feed_" + self.normalized_program_name, episodes[0])
+            print("\t\t- Retrieved episode with title \""+ episodes[0].title + "\" dated from " + str(episodes[0].date))
             # Process the file
             service = ProcessingService(path=destpath, program_pk=self.program_pk, emission_date=self.next_emission_date,
                                 author_name=self.name, email=settings.ADMIN_EMAIL)
             service.process()
-        else:
-            print("\t\t- Automatic RSS Feed Upload for "+ self.normalized_program_name + " is disabled, continuing...")
         return True
 
 # Tests
