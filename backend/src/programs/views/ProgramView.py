@@ -84,10 +84,7 @@ class GetUpdateDeleteRSSView(APIView):
 
     def patch(self, request, pk):
         program = get_object_or_404(Program, pk=pk)
-        # Current values
-        current_url = program.rss_feed_url
-        current_status = program.rss_feed_status
-        # Check new values
+        # TODO: Move data checks and integration to serialization
         new_url = request.data['feed_url']
         new_status = request.data['feed_status']
         try:
@@ -98,7 +95,6 @@ class GetUpdateDeleteRSSView(APIView):
             return Response(status=status.HTTP_406_NOT_ACCEPTABLE)
         except AssertionError:
             return Response(status=status.HTTP_406_NOT_ACCEPTABLE)
-
         program.rss_feed_url = new_url
         program.rss_feed_status = new_status
         return Response(status=status.HTTP_201_CREATED,
