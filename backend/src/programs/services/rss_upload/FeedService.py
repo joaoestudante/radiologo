@@ -21,7 +21,7 @@ class FeedService:
         self.normalized_program_name = self.program.normalized_name()
         self.feed_url = self.program.rss_feed_url
         self.feed_status = self.program.rss_feed_status
-        self.next_emission_date = self.program.next_emission_date()
+        self.next_emission_date = self.program.next_upload_date()
         self.next_emission_date_dt = datetime.strptime(self.next_emission_date,"%Y-%m-%d").date()
         self.name = ""
         self.episodeList = []

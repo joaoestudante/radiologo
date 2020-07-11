@@ -4,7 +4,7 @@ from django.db import models
 from django.contrib.auth import get_user_model
 from django.utils import timezone
 from unidecode import unidecode
-from datetime import timedelta, date
+from datetime import timedelta, date, datetime
 
 DURATIONS = (
     (28, '28'),
@@ -59,7 +59,7 @@ class Program(models.Model):
             result[slot.iso_weekday] = slot.internal_slots_occupied()
         return result
 
-    def next_emission_date(self) -> str:
+    def next_emission_date(self) -> str:  # the actual next date an emission should play
         current_day = date.today()
         current_iso_weekday = current_day.isoweekday()
         if current_iso_weekday in self.enabled_days:
@@ -69,9 +69,24 @@ class Program(models.Model):
                 if (current_day + timedelta(days=i)).isoweekday() in self.enabled_days:
                     return (current_day + timedelta(days=i)).isoformat()
 
+    def next_upload_date(self) -> str:  # the next date an emission should be uploaded to
+        from programs.services.RemoteService import \
+            RemoteService  # it's here to avoid circular imports when initializing
+
+        uploaded_dates = RemoteService().get_uploaded_dates(self)
+        start = date.today()
+        for i in range(52):
+            for i in range(7):
+                day = start + timedelta(days=i)
+                if day.isoweekday() in self.enabled_days and day.strftime("%Y-%m-%d") not in uploaded_dates:
+                    return day.isoformat()
+            start = start + timedelta(days=7)
+
     def get_filename_for_date(self, date: str):
         from programs.services.ProgramService import ProgramService
-        if(len(date) == 9): # includes weekday
-            return self.normalized_name() + date  + ".mp3"
+        if len(date) == 9:  # includes weekday
+            return self.normalized_name() + date + ".mp3"
         else:
-            return self.normalized_name() + date + ProgramService().get_weekday_for_date(self.slot_set, self.enabled_days, date) + ".mp3"
+            return self.normalized_name() + date + ProgramService().get_weekday_for_date(self.slot_set,
+                                                                                         self.enabled_days,
+                                                                                         date) + ".mp3"
