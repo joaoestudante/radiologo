@@ -9,7 +9,7 @@ from django.conf import settings
 from django.http import StreamingHttpResponse
 
 from exceptions.radiologoexception import FileAlreadyUploadedException, FileNotDeletedException, \
-    FileDoesNotExistException
+    FileDoesNotExistException, CouldNotConnectToServerException
 from programs.models import Program
 
 import collections
@@ -23,12 +23,8 @@ class RemoteService:
     def check_file_for_date(self, program, emission_date):  # emission_date is YYYYMMDD
         potential_file = settings.ARCHIVE_SERVER_UPLOAD_DIRECTORY + program + "/" + program + emission_date + "*"
 
-        ssh_client = paramiko.SSHClient()
-        ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        ssh_client.connect(hostname=settings.ARCHIVE_SERVER_IP, username=settings.ARCHIVE_SERVER_USERNAME,
-                           password=settings.ARCHIVE_SERVER_PASSWORD)
-
-        ftp_client = ssh_client.open_sftp()
+        self.open_ssh_archive()
+        ftp_client = self.ssh_client.open_sftp()
         try:
             file = ftp_client.stat(potential_file)
             if file is not None:
@@ -41,19 +37,15 @@ class RemoteService:
     def upload_program_to_archive(self, normalized_program_name, file_path):
         archive_folder = settings.ARCHIVE_SERVER_UPLOAD_DIRECTORY + normalized_program_name + "/"
 
-        ssh_client = paramiko.SSHClient()
-        ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        ssh_client.connect(hostname=settings.ARCHIVE_SERVER_IP, username=settings.ARCHIVE_SERVER_USERNAME,
-                           password=settings.ARCHIVE_SERVER_PASSWORD)
-
-        ftp_client = ssh_client.open_sftp()
+        self.open_ssh_archive()
+        ftp_client = self.ssh_client.open_sftp()
         try:
             ftp_client.chdir(archive_folder)
         except IOError:
             ftp_client.mkdir(archive_folder)
 
         ftp_client.put(file_path, archive_folder + os.path.basename(file_path))
-        ftp_client.close()
+        self.close_connections()
         return
 
     def upload_program_to_emission(self, file_path):
@@ -61,14 +53,10 @@ class RemoteService:
                                                              "")  # Maintains weekday info, if it exists
         emission_file_path = settings.UPLOAD_SERVER_UPLOAD_DIRECTORY + short_filename
 
-        ssh_client = paramiko.SSHClient()
-        ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        ssh_client.connect(hostname=settings.UPLOAD_SERVER_IP, username=settings.UPLOAD_SERVER_USERNAME,
-                           password=settings.UPLOAD_SERVER_PASSWORD)
-
-        ftp_client = ssh_client.open_sftp()
+        self.open_ssh_emission()
+        ftp_client = self.ssh_client.open_sftp()
         ftp_client.put(file_path, emission_file_path)
-        ftp_client.close()
+        self.close_connections()
         return
 
     def download_archive_file(self, program: Program, emission_date: str):
@@ -92,12 +80,8 @@ class RemoteService:
         destination = "/srv/arquivo_sonoro/radiologo/"
         file_list = {}
 
-        ssh_client = paramiko.SSHClient()
-        ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        ssh_client.connect(hostname=settings.ARCHIVE_SERVER_IP, username=settings.ARCHIVE_SERVER_USERNAME,
-                           password=settings.ARCHIVE_SERVER_PASSWORD)
-
-        ftp_client = ssh_client.open_sftp()
+        self.open_ssh_archive()
+        ftp_client = self.ssh_client.open_sftp()
 
         try:
             ftp_client.chdir(destination + normalized_program_name)
@@ -112,18 +96,15 @@ class RemoteService:
         except IOError as e:
             pass
         finally:
+            self.close_connections()
             return file_list
 
     def delete_archive_file(self, program, date):  # date is YYYYMMDDw (where w=weekday and is optional)
         file = settings.ARCHIVE_SERVER_UPLOAD_DIRECTORY + program.normalized_name() + "/" + program.get_filename_for_date(
             date)
 
-        ssh_client = paramiko.SSHClient()
-        ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        ssh_client.connect(hostname=settings.ARCHIVE_SERVER_IP, username=settings.ARCHIVE_SERVER_USERNAME,
-                           password=settings.ARCHIVE_SERVER_PASSWORD)
-
-        ftp_client = ssh_client.open_sftp()
+        self.open_ssh_archive()
+        ftp_client = self.ssh_client.open_sftp()
 
         try:
             ftp_client.remove(file)
@@ -135,17 +116,13 @@ class RemoteService:
             raise FileNotDeletedException
         except IOError:
             pass  # Success
-
+        self.close_connections()
         return
 
     def get_archive_stats(self):
         # Uploaded/not uploaded in the latest 7 days
-        ssh_client = paramiko.SSHClient()
-        ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        ssh_client.connect(hostname=settings.ARCHIVE_SERVER_IP, username=settings.ARCHIVE_SERVER_USERNAME,
-                           password=settings.ARCHIVE_SERVER_PASSWORD)
-
-        ftp_client = ssh_client.open_sftp()
+        self.open_ssh_archive()
+        ftp_client = self.ssh_client.open_sftp()
         ftp_client.chdir(settings.ARCHIVE_SERVER_UPLOAD_DIRECTORY)
 
         stats = collections.defaultdict(self._default_stat_dict)
@@ -161,6 +138,7 @@ class RemoteService:
                         pass  # we can ignore... stats are properly updated anyway
                     self._update_stats_dict(stats, program, iteration_date, ftp_client)
                     ftp_client.chdir("..")
+        self.close_connections()
         return stats
 
     @staticmethod
@@ -176,19 +154,15 @@ class RemoteService:
                 (current_program.pk, current_program.normalized_name()))
 
     def get_uploaded_dates(self, program: Program):
-        ssh_client = paramiko.SSHClient()
-        ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        ssh_client.connect(hostname=settings.ARCHIVE_SERVER_IP, username=settings.ARCHIVE_SERVER_USERNAME,
-                           password=settings.ARCHIVE_SERVER_PASSWORD)
-
-        ftp_client = ssh_client.open_sftp()
+        self.open_ssh_archive()
+        ftp_client = self.ssh_client.open_sftp()
         try:
             ftp_client.chdir(settings.ARCHIVE_SERVER_UPLOAD_DIRECTORY + program.normalized_name())
         except IOError:
             return []
 
         files = ftp_client.listdir()
-        ftp_client.close()
+        self.close_connections()
 
         dates = []
         for file in files:
@@ -214,3 +188,39 @@ class RemoteService:
                                                  destination)
         print("Running:" + command)
         subprocess.run(command.split(","))
+
+    def open_ssh_archive(self):
+        tries = 1
+        while tries <= 5:
+            try:
+                self.ssh_client = paramiko.SSHClient()
+                self.ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+                self.ssh_client.connect(hostname=settings.ARCHIVE_SERVER_IP, username=settings.ARCHIVE_SERVER_USERNAME,
+                                        password=settings.ARCHIVE_SERVER_PASSWORD)
+                print("SSH connection to archive server established.")
+                return
+            except Exception:
+                print("Could not connect to archive server. Trying again. [Attempt {}/5]".format(tries))
+                tries += 1
+        raise CouldNotConnectToServerException
+
+    def open_ssh_emission(self):
+        tries = 1
+        while tries <= 5:
+            try:
+                ssh_client = paramiko.SSHClient()
+                ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+                ssh_client.connect(hostname=settings.UPLOAD_SERVER_IP, username=settings.UPLOAD_SERVER_USERNAME,
+                                   password=settings.UPLOAD_SERVER_PASSWORD)
+                print("SSH connection to upload/emission server established.")
+                return
+            except Exception:
+                print("Could not connect to upload/emission server. Trying again. [Attempt {}/5]".format(tries))
+                tries += 1
+        raise CouldNotConnectToServerException
+
+    def close_connections(self):
+        if self.ssh_client is not None:
+            self.ssh_client.close()
+        if self.ftp_client is not None:
+            self.ftp_client.close()
