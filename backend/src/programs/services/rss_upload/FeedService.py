@@ -2,7 +2,7 @@ from programs.models import Program
 from programs.services.processing.ProcessingService import ProcessingService
 
 from django.conf import settings
-
+from dataclasses import dataclass
 import feedparser
 import requests
 import re  
@@ -21,7 +21,7 @@ class FeedService:
         self.normalized_program_name = self.program.normalized_name()
         self.feed_url = self.program.rss_feed_url
         self.feed_status = self.program.rss_feed_status
-        self.next_emission_date = self.program.next_emission_date()
+        self.next_emission_date = self.program.next_upload_date()
         self.next_emission_date_dt = datetime.strptime(self.next_emission_date,"%Y-%m-%d").date()
         self.name = ""
         self.episodeList = []
@@ -136,11 +136,13 @@ class FeedService:
 
 # downloadEpisode('test', episodelist[0])
 
-class Link(namedtuple):
+@dataclass
+class Link:
     href: str
     type: str
 
-class Episode(namedtuple):
+@dataclass
+class Episode:
     title: str
     duration: timedelta
     date: struct_time
