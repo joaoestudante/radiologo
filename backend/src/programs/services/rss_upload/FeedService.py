@@ -1,17 +1,28 @@
+from programs.models import Program
+from programs.services.processing.ProcessingService import ProcessingService
+
+from django.conf import settings
+
 import feedparser
 import requests
-from django.conf import settings
-import re  # builtin
-import os  # builtin
-from datetime import timedelta  # builtin
-from collections import namedtuple  # builtin
-from operator import attrgetter  # builtin
+import re  
+import os  
+from datetime import timedelta  
+from collections import namedtuple  
+from operator import attrgetter  
 from time import struct_time
+from datetime import timedelta, date, datetime
 
-class RSSRetriever:
+class FeedService:
 
-    def __init__(self, url):
-        self.feed_url = url
+    def __init__(self, program_pk):
+        self.program_pk = program_pk
+        self.program =  Program.objects.get(pk=self.program_pk)
+        self.normalized_program_name = self.program.normalized_name()
+        self.feed_url = self.program.rss_feed_url
+        self.feed_status = self.program.rss_feed_status
+        self.next_emission_date = self.program.next_emission_date()
+        self.next_emission_date_dt = datetime.strptime(self.next_emission_date,"%Y-%m-%d").date()
         self.name = ""
         self.episodeList = []
 
@@ -37,13 +48,13 @@ class RSSRetriever:
             # duration was specified in hours:minutes:seconds
             return timedelta(hours=int(groupings[0]), minutes=int(groupings[1]), seconds=int(groupings[2]))
 
-    def list_episodes_in_podcast(self, feedurl) -> tuple:
+    def list_episodes_in_podcast(self) -> tuple:
         """ Retrieve a list of episodes at the podcast feed
         located in _feedurl_.
         RETURNS [Episode] as list of Episode, podcastname as str"""
 
         # Download and parse feed
-        parsed = feedparser.parse(feedurl)
+        parsed = feedparser.parse(self.feed_url)
 
         self.name = parsed.feed.title
 
@@ -85,18 +96,23 @@ class RSSRetriever:
 
         return destpath
 
-    def download_last_episode(self, normalized_name):
+    def download_last_episode(self):
         """Automatically download last episode"""
-        episodes, podcastname = self.list_episodes_in_podcast(self.feed_url)
-        destpath = self.download_episode(settings.FILE_UPLOAD_DIR + "uploaded_feed_" + normalized_name, episodes[0])
-        # Introduce a function that hands over to processing here
-        # e.g. ProcessFile(destpath_ext)
-        # Introduce a function that notifies
-        # the Programming department by email of successful upload
-        # with information of episode name and its date
-        # e.g. SendEmail(episodes[0].title, episodes[0].date)
-        # Cleanup the file
-        os.remove(destpath)
+        current_day = date.today() 
+        upload_day = self.next_emission_date_dt + timedelta(days=-1) # Upload the day before airing
+        if self.feed_status == True and current_day == upload_day: # REQUIRES daily scheduled running
+            print("\t\t- Automatic RSS Feed Upload for "+ self.normalized_program_name)
+            # Retrieve Episode List
+            episodes, podcastname = self.list_episodes_in_podcast(self.feed_url)
+            print("\t\t- Podcast name: "+ self.name)
+            # Download last episode
+            destpath = self.download_episode(settings.FILE_UPLOAD_DIR + "uploaded_feed_" + self.normalized_program_name, episodes[0])
+            print("\t\t- Retrieved episode with title \""+ episodes[0].title + "\" dated from " + str(episodes[0].date))
+            # Process the file
+            service = ProcessingService(path=destpath, program_pk=self.program_pk, emission_date=self.next_emission_date,
+                                author_name=self.name, email=settings.ADMIN_EMAIL)
+            service.process()
+        return True
 
 # Tests
 
