@@ -5,13 +5,13 @@ from django.conf import settings
 
 import feedparser
 import requests
-from django.conf import settings
-import re  # builtin
-import os  # builtin
-from datetime import timedelta  # builtin
-from collections import namedtuple  # builtin
-from operator import attrgetter  # builtin
+import re  
+import os  
+from datetime import timedelta  
+from collections import namedtuple  
+from operator import attrgetter  
 from time import struct_time
+from datetime import timedelta, date, datetime
 
 class FeedService:
 
@@ -22,6 +22,7 @@ class FeedService:
         self.feed_url = self.program.rss_feed_url
         self.feed_status = self.program.rss_feed_status
         self.next_emission_date = self.program.next_emission_date()
+        self.next_emission_date_dt = datetime.strptime(self.next_emission_date,"%Y-%m-%d").date()
         self.name = ""
         self.episodeList = []
 
@@ -97,7 +98,9 @@ class FeedService:
 
     def download_last_episode(self):
         """Automatically download last episode"""
-        if self.feed_status == True:
+        current_day = date.today() 
+        upload_day = self.next_emission_date_dt + timedelta(days=-1) # Upload the day before airing
+        if self.feed_status == True and current_day == upload_day: # REQUIRES daily scheduled running
             print("\t\t- Automatic RSS Feed Upload for "+ self.normalized_program_name)
             # Retrieve Episode List
             episodes, podcastname = self.list_episodes_in_podcast(self.feed_url)
