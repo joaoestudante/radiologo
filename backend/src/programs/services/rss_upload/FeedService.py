@@ -21,6 +21,7 @@ class FeedService:
         self.normalized_program_name = self.program.normalized_name()
         self.feed_url = self.program.rss_feed_url
         self.feed_status = self.program.rss_feed_status
+        self.next_emission_date = self.program.next_emission_date()
         self.name = ""
         self.episodeList = []
 
@@ -102,9 +103,8 @@ class FeedService:
             # Download last episode
             destpath = self.download_episode(settings.FILE_UPLOAD_DIR + "uploaded_feed_" + self.normalized_program_name, episodes[0])
             # Process the file
-            service = ProcessingService(path=destpath, program_pk=self.program_pk, emission_date=episodes[0].date,
+            service = ProcessingService(path=destpath, program_pk=self.program_pk, emission_date=self.next_emission_date,
                                 author_name=self.name, email=settings.ADMIN_EMAIL)
-            # For code review: is it OK if the emission date is not correct? Will it assume the next available date or do I need to compute it?
             service.process()
         else:
             print("\t\t- Automatic RSS Feed Upload for "+ self.normalized_program_name + " is disabled, continuing...")
