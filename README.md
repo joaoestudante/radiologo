@@ -45,7 +45,7 @@ Check [`backend/Pipfile`](https://github.com/joaoestudante/radiologo/blob/master
       - ``` 
         from users.models.user import CustomUser
         u = CustomUser.objects.get(pk=1)
-        u.set_password("a tua password")
+        u.set_password("your password")
         u.save()
         ```
 
