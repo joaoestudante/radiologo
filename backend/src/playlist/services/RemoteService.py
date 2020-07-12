@@ -20,7 +20,7 @@ class RemoteService:
         self.ftp_client = None
 
     def check_track_exists(self, filename: str):  # emission_date is YYYYMMDD
-        potential_file = "\"\'" + settings.PLAYLIST_SERVER_UPLOAD_DIRECTORY + filename + "\'\""
+        potential_file = settings.PLAYLIST_SERVER_UPLOAD_DIRECTORY + filename
 
         self.open_ssh_playlist()
         ftp_client = self.ssh_client.open_sftp()
@@ -34,13 +34,10 @@ class RemoteService:
         return ftp_client
 
     def upload_track_to_playlist(self, filename: str, local_path: str):
-        playlist_folder = "\"\'" + settings.PLAYLIST_SERVER_UPLOAD_DIRECTORY + "\'\""
-        final_path = "\"\'" + settings.PLAYLIST_SERVER_UPLOAD_DIRECTORY + filename + "\'\""
+        final_path = settings.PLAYLIST_SERVER_UPLOAD_DIRECTORY + filename
 
         self.open_ssh_playlist()
         ftp_client = self.ssh_client.open_sftp()
-        ftp_client.chdir(playlist_folder)
-
         ftp_client.put(local_path, final_path)
         self.close_connections()
         return
@@ -50,7 +47,7 @@ class RemoteService:
         return False
 
     def get_playlist_contents(self):
-        destination = "\"\'" + settings.PLAYLIST_SERVER_UPLOAD_DIRECTORY + "\'\""
+        destination = settings.PLAYLIST_SERVER_UPLOAD_DIRECTORY[:-1]
         file_list = []
 
         self.open_ssh_playlist()
@@ -67,7 +64,7 @@ class RemoteService:
             return file_list
 
     def delete_playlist_file(self, filename: str): 
-        file = "\"\'" + settings.PLAYLIST_SERVER_UPLOAD_DIRECTORY + filename + "\'\""
+        file = settings.PLAYLIST_SERVER_UPLOAD_DIRECTORY + filename
 
         self.open_ssh_playlist()
         ftp_client = self.ssh_client.open_sftp()
