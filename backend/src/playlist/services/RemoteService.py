@@ -37,7 +37,7 @@ class RemoteService:
         playlist_folder = "\"\'" + settings.PLAYLIST_SERVER_UPLOAD_DIRECTORY + "\'\""
         final_path = "\"\'" + settings.PLAYLIST_SERVER_UPLOAD_DIRECTORY + filename + "\'\""
 
-        self.open_ssh_archive()
+        self.open_ssh_playlist()
         ftp_client = self.ssh_client.open_sftp()
         ftp_client.chdir(archive_folder)
 
@@ -91,7 +91,7 @@ class RemoteService:
             try:
                 self.ssh_client = paramiko.SSHClient()
                 self.ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-                self.ssh_client.connect(hostname=PLAYLIST_SERVER_IP, username=settings.PLAYLIST_SERVER_USERNAME,
+                self.ssh_client.connect(hostname=settings.PLAYLIST_SERVER_IP, username=settings.PLAYLIST_SERVER_USERNAME,
                                         password=settings.PLAYLIST_SERVER_PASSWORD)
                 print("SSH connection to playlist server established.")
                 return
