@@ -32,13 +32,13 @@ class ProgramService:
 
     def get_schedule(self):
         events = []
+        current_week_dates = []
+        for i in range(1, 8):
+            current_week_dates.append(
+                (date.today() + timedelta(days=i - date.today().isoweekday())).isoformat()
+            )
         for slot in Slot.objects.all():
             if slot.program.state == 'A':
-                current_week_dates = []
-                for i in range(1, 8):
-                    current_week_dates.append(
-                        (date.today() + timedelta(days=i - date.today().isoweekday())).isoformat()
-                    )
                 start = current_week_dates[slot.iso_weekday - 1] + " " + slot.time.strftime("%H:%M")
                 end = current_week_dates[slot.iso_weekday - 1] + " " + slot.end_time()
                 events.append({"name": slot.program.name, "start": start, "end": end})
