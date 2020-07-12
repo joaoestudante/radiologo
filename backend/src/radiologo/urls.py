@@ -22,6 +22,7 @@ from radiologo.jwtclaims import RadiologoTokenObtainPairView
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('programs/', include('programs.urls')),
+    path('playlist/', include('playlist.urls')),
     path('users/', include('users.urls')),
     path('keys/', include('keys.urls')),
     path('token/', RadiologoTokenObtainPairView.as_view(), name='token_obtain_pair'),

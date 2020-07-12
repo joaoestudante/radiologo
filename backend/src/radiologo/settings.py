@@ -31,6 +31,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'programs',
+    'playlist',
     'users',
     'exceptions',
     'keys',
@@ -191,3 +192,7 @@ UPLOAD_SERVER_IP = config.get("Servers", "UploadServer.ip")
 UPLOAD_SERVER_USERNAME = config.get("Servers", "UploadServer.username")
 UPLOAD_SERVER_PASSWORD = config.get("Servers", "UploadServer.password")
 UPLOAD_SERVER_UPLOAD_DIRECTORY = config.get("Servers", "UploadServer.rootUploadDirectory")
+PLAYLIST_SERVER_IP = config.get("Servers", "PlaylistServer.ip")
+PLAYLIST_SERVER_USERNAME = config.get("Servers", "PlaylistServer.username")
+PLAYLIST_SERVER_PASSWORD = config.get("Servers", "PlaylistServer.password")
+PLAYLIST_SERVER_UPLOAD_DIRECTORY = config.get("Servers", "PlaylistServer.rootUploadDirectory")

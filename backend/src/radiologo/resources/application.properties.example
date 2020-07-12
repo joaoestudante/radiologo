@@ -10,6 +10,11 @@ ArchiveServer.username =
 ArchiveServer.password = 
 ArchiveServer.rootUploadDirectory = 
 
+PlaylistServer.ip = 
+PlaylistServer.username = 
+PlaylistServer.password = 
+PlaylistServer.rootUploadDirectory = 
+
 [Email]
 EmailHost =
 EmailHostUser =

@@ -34,6 +34,21 @@ Check [`backend/Pipfile`](https://github.com/joaoestudante/radiologo/blob/master
 * Check that the expected services are running:
   - `docker ps` or `docker-compose ps`
 
+#### Docker: First time DB configuration
+
+1. Create a superuser
+  - ` sudo docker exec -it radiologo-backend /bin/sh -c 'pipenv run python manage.py createsuperuser' `
+2. Set superuser password (properly)
+  - Open the shell: 
+      ` sudo docker exec -it radiologo-backend /bin/sh -c 'pipenv run python manage.py shell' ` 
+  - Run the commands:
+      - ``` 
+        from users.models.user import CustomUser
+        u = CustomUser.objects.get(pk=1)
+        u.set_password("your password")
+        u.save()
+        ```
+
 
 ### Traditional
 Start by installing `pipenv`:
