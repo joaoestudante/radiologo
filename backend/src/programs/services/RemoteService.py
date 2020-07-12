@@ -208,9 +208,9 @@ class RemoteService:
         tries = 1
         while tries <= 5:
             try:
-                ssh_client = paramiko.SSHClient()
-                ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-                ssh_client.connect(hostname=settings.UPLOAD_SERVER_IP, username=settings.UPLOAD_SERVER_USERNAME,
+                self.ssh_client = paramiko.SSHClient()
+                self.ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+                self.ssh_client.connect(hostname=settings.UPLOAD_SERVER_IP, username=settings.UPLOAD_SERVER_USERNAME,
                                    password=settings.UPLOAD_SERVER_PASSWORD)
                 print("SSH connection to upload/emission server established.")
                 return
