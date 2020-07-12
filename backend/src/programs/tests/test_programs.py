@@ -67,14 +67,17 @@ class ProgramTest(TestCase):
     def test_disabled_days(self):
         p1 = self.program_service.create_program(name=self.program_1_name, description=self.program_description,
                                                  authors=[self.author_1], max_duration=28, comes_normalized=True)
-        self.slot_service.create_slot(iso_weekday=2, time=datetime.strptime("00:03", "%H:%M"), program_object=p1)
+        self.slot_service.create_slot(iso_weekday=2, time=datetime.strptime("00:03", "%H:%M"), program_object=p1,
+                                      is_rerun=False)
         self.assertEqual(p1.disabled_days, (1, 3, 4, 5, 6, 7))
 
     def test_enabled_days(self):
         p1 = self.program_service.create_program(name=self.program_1_name, description=self.program_description,
                                                  authors=[self.author_1], max_duration=28, comes_normalized=True)
-        self.slot_service.create_slot(iso_weekday=2, time=datetime.strptime("00:03", "%H:%M"), program_object=p1)
-        self.slot_service.create_slot(iso_weekday=3, time=datetime.strptime("00:03", "%H:%M"), program_object=p1)
+        self.slot_service.create_slot(iso_weekday=2, time=datetime.strptime("00:03", "%H:%M"), program_object=p1,
+                                      is_rerun=False)
+        self.slot_service.create_slot(iso_weekday=3, time=datetime.strptime("00:03", "%H:%M"), program_object=p1,
+                                      is_rerun=False)
 
         self.assertEqual(p1.enabled_days, (2, 3))
 
@@ -83,28 +86,34 @@ class ProgramTest(TestCase):
                                                  authors=[self.author_1], max_duration=28, comes_normalized=True)
         tomorrow = date.today() + timedelta(days=1)
         self.slot_service.create_slot(iso_weekday=tomorrow.isoweekday(), time=datetime.strptime("00:03", "%H:%M"),
-                                      program_object=p1)
+                                      program_object=p1, is_rerun=False)
         self.assertEqual(p1.next_emission_date(), tomorrow.isoformat())
 
     def test_occupied_slots_28(self):
         p1 = self.program_service.create_program(name=self.program_1_name, description=self.program_description,
                                                  authors=[self.author_1], max_duration=28, comes_normalized=True)
-        self.slot_service.create_slot(iso_weekday=2, time=datetime.strptime("00:03", "%H:%M"), program_object=p1)
-        self.slot_service.create_slot(iso_weekday=3, time=datetime.strptime("00:03", "%H:%M"), program_object=p1)
+        self.slot_service.create_slot(iso_weekday=2, time=datetime.strptime("00:03", "%H:%M"), program_object=p1,
+                                      is_rerun=False)
+        self.slot_service.create_slot(iso_weekday=3, time=datetime.strptime("00:03", "%H:%M"), program_object=p1,
+                                      is_rerun=False)
         self.assertEqual(p1.occupied_slots, {2: ("00:03",), 3: ("00:03",)})
 
     def test_occupied_slots_57(self):
         p1 = self.program_service.create_program(name=self.program_1_name, description=self.program_description,
                                                  authors=[self.author_1], max_duration=57, comes_normalized=True)
-        self.slot_service.create_slot(iso_weekday=2, time=datetime.strptime("00:03", "%H:%M"), program_object=p1)
-        self.slot_service.create_slot(iso_weekday=3, time=datetime.strptime("00:03", "%H:%M"), program_object=p1)
+        self.slot_service.create_slot(iso_weekday=2, time=datetime.strptime("00:03", "%H:%M"), program_object=p1,
+                                      is_rerun=False)
+        self.slot_service.create_slot(iso_weekday=3, time=datetime.strptime("00:03", "%H:%M"), program_object=p1,
+                                      is_rerun=False)
         self.assertEqual(p1.occupied_slots, {2: ("00:03", "00:32"), 3: ("00:03", "00:32")})
 
     def test_occupied_slots_117(self):
         p1 = self.program_service.create_program(name=self.program_1_name, description=self.program_description,
                                                  authors=[self.author_1], max_duration=117, comes_normalized=True)
-        self.slot_service.create_slot(iso_weekday=2, time=datetime.strptime("00:03", "%H:%M"), program_object=p1)
-        self.slot_service.create_slot(iso_weekday=7, time=datetime.strptime("00:03", "%H:%M"), program_object=p1)
+        self.slot_service.create_slot(iso_weekday=2, time=datetime.strptime("00:03", "%H:%M"), program_object=p1,
+                                      is_rerun=False)
+        self.slot_service.create_slot(iso_weekday=7, time=datetime.strptime("00:03", "%H:%M"), program_object=p1,
+                                      is_rerun=False)
         self.assertEqual(p1.occupied_slots,
                          {2: ("00:03", "00:32", "01:03", "01:32"), 7: ("00:03", "00:32", "01:03", "01:32")})
 
@@ -113,8 +122,10 @@ class ProgramTest(TestCase):
                                                  authors=[self.author_1], max_duration=57, comes_normalized=True)
         p2 = self.program_service.create_program(name=self.program_2_name, description=self.program_description,
                                                  authors=[self.author_1], max_duration=57, comes_normalized=True)
-        self.slot_service.create_slot(iso_weekday=2, time=datetime.strptime("00:03", "%H:%M"), program_object=p1)
-        self.slot_service.create_slot(iso_weekday=2, time=datetime.strptime("21:03", "%H:%M"), program_object=p2)
+        self.slot_service.create_slot(iso_weekday=2, time=datetime.strptime("00:03", "%H:%M"), program_object=p1,
+                                      is_rerun=False)
+        self.slot_service.create_slot(iso_weekday=2, time=datetime.strptime("21:03", "%H:%M"), program_object=p2,
+                                      is_rerun=False)
 
         self.assertEqual(self.slot_service.occupied_slots_in_day(iso_weekday=2),
                          ("00:03", "00:32", "21:03", "21:32"))
@@ -126,9 +137,12 @@ class ProgramTest(TestCase):
                                                  authors=[self.author_1], max_duration=28, comes_normalized=True)
         p3 = self.program_service.create_program(name="asd", description=self.program_description,
                                                  authors=[self.author_1], max_duration=57, comes_normalized=True)
-        self.slot_service.create_slot(iso_weekday=2, time=datetime.strptime("00:03", "%H:%M"), program_object=p1)
-        self.slot_service.create_slot(iso_weekday=2, time=datetime.strptime("02:03", "%H:%M"), program_object=p2)
-        self.slot_service.create_slot(iso_weekday=3, time=datetime.strptime("21:03", "%H:%M"), program_object=p3)
+        self.slot_service.create_slot(iso_weekday=2, time=datetime.strptime("00:03", "%H:%M"), program_object=p1,
+                                      is_rerun=False)
+        self.slot_service.create_slot(iso_weekday=2, time=datetime.strptime("02:03", "%H:%M"), program_object=p2,
+                                      is_rerun=False)
+        self.slot_service.create_slot(iso_weekday=3, time=datetime.strptime("21:03", "%H:%M"), program_object=p3,
+                                      is_rerun=False)
         self.assertEqual(self.slot_service.occupied_slots_in_week(),
                          {1: (),
                           2: ("00:03", "00:32", "02:03"),

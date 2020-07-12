@@ -59,5 +59,5 @@ class ProgramSerializer(serializers.ModelSerializer):
     def create_slots_from_data(slots_data, created_program):
         for slot in slots_data:
             dict_slot = dict(slot)
-            SlotService().create_slot(int(dict_slot['iso_weekday']), dict_slot['time'],
-                                      created_program)
+            SlotService().create_slot(iso_weekday=int(dict_slot['iso_weekday']), time=dict_slot['time'],
+                                      is_rerun=dict_slot.get("is_rerun", False), program_object=created_program)
