@@ -61,7 +61,7 @@ class RemoteService:
             pass
         finally:
             self.close_connections()
-            return file_list
+            return { i : file_list[i] for i in range(0, len(file_list) ) }
 
     def delete_playlist_file(self, filename: str): 
         file = settings.PLAYLIST_SERVER_UPLOAD_DIRECTORY + filename
