@@ -33,15 +33,15 @@ class RemoteService:
 
         return ftp_client
 
-    def upload_track_to_playlist(self, filename: str, initial_file_path: str):
+    def upload_track_to_playlist(self, filename: str, local_path: str):
         playlist_folder = "\"\'" + settings.PLAYLIST_SERVER_UPLOAD_DIRECTORY + "\'\""
         final_path = "\"\'" + settings.PLAYLIST_SERVER_UPLOAD_DIRECTORY + filename + "\'\""
 
         self.open_ssh_playlist()
         ftp_client = self.ssh_client.open_sftp()
-        ftp_client.chdir(archive_folder)
+        ftp_client.chdir(playlist_folder)
 
-        ftp_client.put(initial_file_path, final_path)
+        ftp_client.put(local_path, final_path)
         self.close_connections()
         return
 

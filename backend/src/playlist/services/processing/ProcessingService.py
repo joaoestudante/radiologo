@@ -11,8 +11,6 @@ from pydub import AudioSegment
 from playlist.services.RemoteService import RemoteService
 from programs.services.processing.FileChecker import FileChecker, IrrecoverableProblemsException
 #uses the FileChecker from programs, consider putting in more general Radiologo 
-from radiologo.emailservice import EmailService
-
 
 class ProcessingService:
     def __init__(self, path: str, artist: str, title: str):
