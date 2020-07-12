@@ -27,7 +27,8 @@ class UploadTrackView(APIView):
 class GetDeleteTrackView(APIView):
     """ Expects filename as name in URL path"""
     def get(self, request, name):
-        return RemoteService().download_playlist_file(filename = name)
+        # return RemoteService().download_playlist_file(filename = name)
+        return Response(status=status.HTTP_501_NOT_IMPLEMENTED)
 
     def delete(self, request, name):
         RemoteService().delete_playlist_file(filename = name)
