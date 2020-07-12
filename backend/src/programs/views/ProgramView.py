@@ -137,3 +137,8 @@ class GetProgramAlreadyUploadedDates(APIView):
         program = Program.objects.get(pk=pk)
         dates = RemoteService().get_uploaded_dates(program)
         return Response(status=status.HTTP_200_OK, data=json.dumps(dates))
+
+class GetWeeklySchedule(APIView):
+    def get(self, request):
+        schedule = ProgramService().get_schedule()
+        return Response(status=status.HTTP_200_OK, data=schedule)

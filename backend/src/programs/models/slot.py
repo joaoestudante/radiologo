@@ -1,6 +1,6 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from datetime import datetime
+from datetime import datetime, timedelta
 from .program import Program
 
 # This is our own format - it is not a standard
@@ -100,8 +100,6 @@ class Slot(models.Model):
         """
         return [7, 1, 2, 3, 4, 5, 6][int(self.weekday) - 1]
 
-
-
     @staticmethod
     def next_available(duration: int, time: datetime.time) -> str:
         current_index = allowed_slots.index(time.strftime("%H:%M"))
@@ -145,3 +143,8 @@ class Slot(models.Model):
 
     def internal_slots_occupied(self):
         return self.slots_occupied(self.program.max_duration, self.time)
+
+    def end_time(self):
+        now = datetime.now()
+        return (datetime(year=now.year, month=now.month, day=now.day, hour=self.time.hour, minute=self.time.minute) + timedelta(
+            minutes=self.program.max_duration)).strftime("%H:%M")
