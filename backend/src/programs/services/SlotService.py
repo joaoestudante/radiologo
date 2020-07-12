@@ -11,11 +11,11 @@ class SlotService:
     def __init__(self):
         pass
 
-    def create_slot(self, iso_weekday: int, time: datetime.time, program_object: Program):
+    def create_slot(self, iso_weekday: int, time: datetime.time, program_object: Program, is_rerun:bool):
         self.check_occupied_slot(iso_weekday, time)
         self.check_next_slots(iso_weekday, time, program_object)
         self.check_prev_slots(iso_weekday, time, program_object)
-        s = Slot(weekday=iso_weekday, time=time, program=program_object)
+        s = Slot(weekday=iso_weekday, time=time, is_rerun=is_rerun, program=program_object)
         s.save()
         return s
 

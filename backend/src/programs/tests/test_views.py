@@ -26,9 +26,9 @@ class ListCreateProgramsTest(TestCase):
 
         slot_service = SlotService()
         midnight = datetime.strptime("00:03", "%H:%M")
-        slot_service.create_slot(1, midnight, p1)
-        slot_service.create_slot(2, midnight, p2)
-        slot_service.create_slot(3, midnight, p3)
+        slot_service.create_slot(1, midnight, p1, False)
+        slot_service.create_slot(2, midnight, p2, False)
+        slot_service.create_slot(3, midnight, p3, False)
 
         logged_in_user = CustomUser(email="logged@in.com",
                                     password="password",
@@ -56,7 +56,8 @@ class ListCreateProgramsTest(TestCase):
             "slot_set": [
                 {
                     "iso_weekday": "4",
-                    "time": "00:03"
+                    "time": "00:03",
+                    "is_rerun":False
                 }
             ],
             "authors": []
@@ -131,9 +132,9 @@ class GetUpdateDeleteProgramsTest(TestCase):
 
         slot_service = SlotService()
         midnight = datetime.strptime("00:03", "%H:%M")
-        slot_service.create_slot(1, midnight, self.p1)
-        slot_service.create_slot(2, midnight, self.p2)
-        slot_service.create_slot(3, midnight, self.p3)
+        slot_service.create_slot(1, midnight, self.p1, False)
+        slot_service.create_slot(2, midnight, self.p2, False)
+        slot_service.create_slot(3, midnight, self.p3, False)
 
         user_service = UserService()
         user_service.create_user(email="a@asd.com", password="password", author_name="A1",

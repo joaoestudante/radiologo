@@ -50,7 +50,7 @@ class Program(models.Model):
 
     @cached_property
     def enabled_days(self) -> tuple:
-        return tuple([slot.iso_weekday for slot in self.slot_set.all().order_by('weekday')])
+        return tuple([slot.iso_weekday for slot in self.slot_set.filter(is_rerun=False).order_by('weekday')])
 
     @cached_property
     def occupied_slots(self) -> dict:

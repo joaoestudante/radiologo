@@ -73,6 +73,7 @@ class Slot(models.Model):
     weekday = models.CharField(max_length=15, choices=WEEKDAYS)
     time = models.TimeField()
     program = models.ForeignKey(to=Program, on_delete=models.CASCADE)
+    is_rerun = models.BooleanField(default=False)
 
     def __init__(self, *args, **kwargs):
         if (kwargs):
@@ -81,7 +82,11 @@ class Slot(models.Model):
         super().__init__(*args, **kwargs)
 
     def __str__(self):
-        return self.get_weekday_display() + ", " + self.time.strftime("%H:%M") + " - (" + str(self.program) + ")"
+        if self.is_rerun:
+            return self.get_weekday_display() + ", " + self.time.strftime("%H:%M") + " - (" + str(self.program) + ", rerun)"
+        else:
+            return self.get_weekday_display() + ", " + self.time.strftime("%H:%M") + " - (" + str(self.program) + ")"
+
 
     @staticmethod
     def iso_to_custom_format(iso: int):
