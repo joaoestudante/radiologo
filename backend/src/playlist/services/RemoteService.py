@@ -2,6 +2,7 @@ import os
 import re
 import subprocess
 from datetime import datetime, timedelta
+from stat import S_ISREG
 
 import paramiko
 import requests
@@ -54,9 +55,10 @@ class RemoteService:
         ftp_client = self.ssh_client.open_sftp()
 
         try:
-            ftp_client.chdir(destination)
-            for file_name in ftp_client.listdir():
-                file_list.append(file_name)
+            for entry in ftp_client.listdir_attr(destination):
+                mode = entry.st_mode
+                if S_ISREG(mode):
+                    file_list.append(entry.filename)
         except IOError as e:
             pass
         finally:
