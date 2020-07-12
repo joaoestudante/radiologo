@@ -1,7 +1,7 @@
 from django.urls import path
 from .views.ProgramView import ListCreateProgramsView, GetUpdateDeleteProgramView, UploadProgramView, \
     GetUpdateDeleteRSSView, GetDeleteArchiveProgramView, GetArchiveContentsView, GetArchiveStatistics, \
-    GetProgramAlreadyUploadedDates
+    GetProgramAlreadyUploadedDates, GetWeeklySchedule
 
 urlpatterns = [
     path('', ListCreateProgramsView.as_view()),
@@ -12,4 +12,5 @@ urlpatterns = [
     path('<int:pk>/archive/<str:date>/', GetDeleteArchiveProgramView.as_view(), name='programdownload'),
     path('<int:pk>/archive/', GetArchiveContentsView.as_view(), name='programarchive'),
     path('archive/stats/', GetArchiveStatistics.as_view(), name='programarchivestats'),
+    path('schedule/', GetWeeklySchedule.as_view(), name='programschedule')
 ]

@@ -26,11 +26,21 @@ services:
 
   celery:
     build: ./backend/
-    command: pipenv run celery -A radiologo worker -B --loglevel=INFO
+    command: pipenv run celery -A radiologo worker --loglevel=INFO
     volumes:
       - ./backend:/var/www/radiologo
     links:
       - redis
+
+  celery-beat:
+    build: ./backend/
+    command: pipenv run celery -A radiologo beat -l debug
+    volumes:
+      - ./backend:/var/www/radiologo
+    links:
+      - redis
+    depends_on:
+      - celery
 
   monitor:
     build: ./backend/

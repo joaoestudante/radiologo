@@ -81,3 +81,9 @@ class FileDoesNotExistException(RadiologoException):
     status_code = 400
     default_detail = 'There was no uploaded file found for the requested date. Contact us if you believe this is an error.'
     default_code = 'file_does_not_exist'
+
+
+class CouldNotConnectToServerException(RadiologoException):
+    status_code = 500
+    default_detail = 'There was an error on our end when connecting to another server. Please report this incident to radiologo@radiozero.pt.'
+    default_code = 'could_not_connect_to_server'

@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, date, timedelta
 
 from exceptions.radiologoexception import InvalidDateFormatForEmissionException, InvalidDateForEmissionException
 from ..models import Program, Slot
@@ -13,7 +13,6 @@ class ProgramService:
         p.save()
         p.authors.set(authors)
         return p
-
 
     def get_weekday_for_date(self, slot_set, enabled_days, date):
         try:
@@ -30,3 +29,17 @@ class ProgramService:
         else:
             weekday = ""
         return weekday
+
+    def get_schedule(self):
+        events = []
+        current_week_dates = []
+        for i in range(1, 8):
+            current_week_dates.append(
+                (date.today() + timedelta(days=i - date.today().isoweekday())).isoformat()
+            )
+        for slot in Slot.objects.all():
+            if slot.program.state == 'A':
+                start = current_week_dates[slot.iso_weekday - 1] + " " + slot.time.strftime("%H:%M")
+                end = current_week_dates[slot.iso_weekday - 1] + " " + slot.end_time()
+                events.append({"name": slot.program.name, "start": start, "end": end})
+        return events
