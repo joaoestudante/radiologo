@@ -1,12 +1,19 @@
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from rest_framework.response import Response
 import rest_framework.status as status
-from rest_framework import authentication, permissions
+
+from radiologo.permissions import IsProgrammingR, IsDirector, IsRadiologoDeveloper, IsTechnicalLogisticR, \
+    IsCommunicationMarketingR, IsAdministration
 from ..serializers.UserSerializer import UserSerializer
 from ..models.user import CustomUser
 
 
 class ListCreateUsersView(APIView):
+    permission_classes = (
+            IsAuthenticated, (
+                IsProgrammingR | IsTechnicalLogisticR | IsCommunicationMarketingR | IsAdministration | IsDirector |
+                IsRadiologoDeveloper))
 
     def get(self, request):
         users = [user for user in CustomUser.objects.all()]
@@ -21,6 +28,10 @@ class ListCreateUsersView(APIView):
 
 
 class GetUpdateDeleteUserView(APIView):
+    permission_classes = (
+            IsAuthenticated, (
+                IsProgrammingR | IsTechnicalLogisticR | IsCommunicationMarketingR | IsAdministration | IsDirector |
+                IsRadiologoDeveloper))
 
     def get(self, request, pk):
         user = CustomUser.objects.get(pk=pk)
