@@ -5,6 +5,7 @@ import paramiko
 from django.conf import settings
 from django.core.validators import URLValidator
 from django.core.exceptions import ValidationError
+from rest_framework.permissions import IsAuthenticated
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -13,6 +14,7 @@ from rest_framework import authentication, permissions
 
 from exceptions.radiologoexception import InvalidDateFormatForEmissionException, InvalidDateForEmissionException
 from radiologo import celery_app
+from radiologo.permissions import IsRadiologoDeveloper, IsProgrammingRW, IsProgramOwner, IsTechnicalLogisticRW
 from .. import tasks
 from ..models import Slot
 from ..serializers.ProgramSerializer import ProgramSerializer
@@ -23,8 +25,17 @@ from ..services.ProgramService import ProgramService
 from ..services.RemoteService import RemoteService
 from ..services.processing.ProcessingService import ProcessingService
 
+from radiologo.permissions import IsProgrammingR, IsDirector, IsRadiologoDeveloper, IsTechnicalLogisticR, \
+    IsCommunicationMarketingR, IsAdministration
+
 
 class ListCreateProgramsView(APIView):
+    permission_classes = (
+        IsAuthenticated, (
+                IsAdministration | IsDirector | IsRadiologoDeveloper |
+                IsProgrammingR | IsTechnicalLogisticR | IsCommunicationMarketingR
+        )
+    )
 
     def get(self, request):
         programs = [program for program in Program.objects.all()]
@@ -39,6 +50,12 @@ class ListCreateProgramsView(APIView):
 
 
 class GetUpdateDeleteProgramView(APIView):
+    permission_classes = (
+        IsAuthenticated, (
+                IsAdministration | IsDirector | IsRadiologoDeveloper |
+                IsProgrammingR | IsTechnicalLogisticR | IsCommunicationMarketingR
+        )
+    )
 
     def get(self, request, pk):
         program = get_object_or_404(Program, pk=pk)
@@ -59,14 +76,21 @@ class GetUpdateDeleteProgramView(APIView):
 
 
 class UploadProgramView(APIView):
+    permission_classes = (
+        IsAuthenticated, (
+                IsAdministration | IsDirector | IsRadiologoDeveloper |
+                IsProgramOwner | IsProgrammingRW | IsTechnicalLogisticRW
+        )
+    )
 
     def put(self, request, pk):
         program = Program.objects.get(pk=pk)
 
-        ProcessingService.save_file(uploaded_file=request.data['file'], emission_date=request.data['date'], program=program)
+        ProcessingService.save_file(uploaded_file=request.data['file'], emission_date=request.data['date'],
+                                    program=program)
 
         tasks.process_audio.delay(uploaded_file_path=settings.FILE_UPLOAD_DIR + request.data['file'].name,
-                                  program_pk = program.pk,
+                                  program_pk=program.pk,
                                   uploader=request.user.author_name,
                                   email=request.user.email,
                                   emission_date=request.data['date'])
@@ -75,12 +99,19 @@ class UploadProgramView(APIView):
 
 
 class GetUpdateDeleteRSSView(APIView):
+    permission_classes = (
+        IsAuthenticated, (
+                IsAdministration | IsDirector | IsRadiologoDeveloper |
+                IsProgrammingRW | IsTechnicalLogisticRW
+        )
+    )
+
     def get(self, request, pk):
         program = get_object_or_404(Program, pk=pk)
         rss_feed_url = program.rss_feed_url
         rss_status = program.rss_feed_status
         return Response(status=status.HTTP_200_OK,
-                        data=json.dumps({'feed_url': rss_feed_url, 'feed_status': rss_status}))
+                        data={'feed_url': rss_feed_url, 'feed_status': rss_status})
 
     def patch(self, request, pk):
         program = get_object_or_404(Program, pk=pk)
@@ -99,7 +130,7 @@ class GetUpdateDeleteRSSView(APIView):
         program.rss_feed_status = new_status
         program.save()
         return Response(status=status.HTTP_201_CREATED,
-                        data=json.dumps({'feed_url': program.rss_feed_url, 'feed_status': program.rss_feed_status}))
+                        data={'feed_url': program.rss_feed_url, 'feed_status': program.rss_feed_status})
 
     def delete(self, request, pk):
         program = get_object_or_404(Program, pk=pk)
@@ -110,6 +141,14 @@ class GetUpdateDeleteRSSView(APIView):
 
 
 class GetDeleteArchiveProgramView(APIView):
+    permission_classes = (
+        IsAuthenticated, (
+                IsAdministration | IsDirector | IsRadiologoDeveloper |
+                IsProgrammingRW | IsTechnicalLogisticRW | IsCommunicationMarketingR |
+                IsProgramOwner
+        )
+    )
+
     def get(self, request, pk, date):
         program = get_object_or_404(Program, pk=pk)
         return RemoteService().download_archive_file(program, date)
@@ -121,24 +160,46 @@ class GetDeleteArchiveProgramView(APIView):
 
 
 class GetArchiveContentsView(APIView):
+    permission_classes = (
+        IsAuthenticated, (
+                IsAdministration | IsDirector | IsRadiologoDeveloper |
+                IsProgrammingR | IsTechnicalLogisticR | IsCommunicationMarketingR |
+                IsProgramOwner
+        )
+    )
+
     def get(self, request, pk):
         program = get_object_or_404(Program, pk=pk)
         file_list = RemoteService().get_archive_contents(program.normalized_name())
-        return Response(status=status.HTTP_200_OK, data=json.dumps(file_list))
+        return Response(status=status.HTTP_200_OK, data=file_list)
 
 
 class GetArchiveStatistics(APIView):
+    permission_classes = (
+        IsAuthenticated, (
+                IsAdministration | IsDirector | IsRadiologoDeveloper |
+                IsProgrammingR | IsTechnicalLogisticR | IsCommunicationMarketingR |
+                IsProgramOwner
+        )
+    )
+
     def get(self, request):
         stats = RemoteService().get_archive_stats()
-        return Response(status=status.HTTP_200_OK, data=json.dumps(stats))
+        return Response(status=status.HTTP_200_OK, data=stats)
+
 
 class GetProgramAlreadyUploadedDates(APIView):
+    permission_classes = UploadProgramView.permission_classes
+
     def get(self, request, pk):
         program = Program.objects.get(pk=pk)
         dates = RemoteService().get_uploaded_dates(program)
-        return Response(status=status.HTTP_200_OK, data=json.dumps(dates))
+        return Response(status=status.HTTP_200_OK, data=dates)
+
 
 class GetWeeklySchedule(APIView):
+    permission_classes = ()
+
     def get(self, request):
         schedule = ProgramService().get_schedule()
         return Response(status=status.HTTP_200_OK, data=schedule)

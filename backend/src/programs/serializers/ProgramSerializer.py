@@ -15,7 +15,7 @@ class ProgramSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Program
-        fields = ['name', 'description', 'max_duration', 'first_emission_date', 'comes_normalized',
+        fields = ['id', 'name', 'description', 'max_duration', 'first_emission_date', 'comes_normalized',
                   'ignore_duration_adjustment', 'is_external', 'state', 'slot_set', 'authors']
 
     @transaction.atomic
@@ -40,7 +40,7 @@ class ProgramSerializer(serializers.ModelSerializer):
 
         self.update_other_instance_fields(instance, validated_data)
         instance.save()
-        
+
         return instance
 
     @staticmethod
