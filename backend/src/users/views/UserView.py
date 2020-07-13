@@ -11,9 +11,11 @@ from ..models.user import CustomUser
 
 class ListCreateUsersView(APIView):
     permission_classes = (
-            IsAuthenticated, (
-                IsProgrammingR | IsTechnicalLogisticR | IsCommunicationMarketingR | IsAdministration | IsDirector |
-                IsRadiologoDeveloper))
+        IsAuthenticated, (
+                IsAdministration | IsDirector | IsRadiologoDeveloper |
+                IsProgrammingR | IsTechnicalLogisticR | IsCommunicationMarketingR
+        )
+    )
 
     def get(self, request):
         users = [user for user in CustomUser.objects.all()]
@@ -29,9 +31,11 @@ class ListCreateUsersView(APIView):
 
 class GetUpdateDeleteUserView(APIView):
     permission_classes = (
-            IsAuthenticated, (
-                IsProgrammingR | IsTechnicalLogisticR | IsCommunicationMarketingR | IsAdministration | IsDirector |
-                IsRadiologoDeveloper))
+        IsAuthenticated, (
+                IsAdministration | IsDirector | IsRadiologoDeveloper |
+                IsProgrammingR | IsTechnicalLogisticR | IsCommunicationMarketingR
+        )
+    )
 
     def get(self, request, pk):
         user = CustomUser.objects.get(pk=pk)

@@ -66,9 +66,11 @@ class InviteAcceptView(APIView):
 
 class InviteListView(generics.ListAPIView):
     permission_classes = (
-            IsAuthenticated, (
-                IsProgrammingR | IsTechnicalLogisticR | IsAdministration | IsDirector |
-                IsRadiologoDeveloper))
+        IsAuthenticated, (
+                IsAdministration | IsDirector | IsRadiologoDeveloper |
+                IsProgrammingR | IsTechnicalLogisticR
+        )
+    )
 
     serializer_class = InviteSerializer
     queryset = Invite.objects.all()
@@ -76,9 +78,11 @@ class InviteListView(generics.ListAPIView):
 
 class InviteResendView(APIView):
     permission_classes = (
-            IsAuthenticated, (
-                IsProgrammingR | IsTechnicalLogisticR | IsAdministration | IsDirector |
-                IsRadiologoDeveloper))
+        IsAuthenticated, (
+                IsAdministration | IsDirector | IsRadiologoDeveloper |
+                IsProgrammingR | IsTechnicalLogisticR
+        )
+    )
 
     def post(self, request):
         user = get_user_model().objects.get(author_name=request.data["invited_user_author_name"])

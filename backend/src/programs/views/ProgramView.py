@@ -32,8 +32,10 @@ from radiologo.permissions import IsProgrammingR, IsDirector, IsRadiologoDevelop
 class ListCreateProgramsView(APIView):
     permission_classes = (
         IsAuthenticated, (
-                IsProgrammingR | IsTechnicalLogisticR | IsCommunicationMarketingR | IsAdministration | IsDirector |
-                IsRadiologoDeveloper))
+                IsAdministration | IsDirector | IsRadiologoDeveloper |
+                IsProgrammingR | IsTechnicalLogisticR | IsCommunicationMarketingR
+        )
+    )
 
     def get(self, request):
         programs = [program for program in Program.objects.all()]
@@ -50,8 +52,10 @@ class ListCreateProgramsView(APIView):
 class GetUpdateDeleteProgramView(APIView):
     permission_classes = (
         IsAuthenticated, (
-                IsProgrammingR | IsTechnicalLogisticR | IsCommunicationMarketingR | IsAdministration | IsDirector |
-                IsRadiologoDeveloper))
+                IsAdministration | IsDirector | IsRadiologoDeveloper |
+                IsProgrammingR | IsTechnicalLogisticR | IsCommunicationMarketingR
+        )
+    )
 
     def get(self, request, pk):
         program = get_object_or_404(Program, pk=pk)
@@ -74,7 +78,10 @@ class GetUpdateDeleteProgramView(APIView):
 class UploadProgramView(APIView):
     permission_classes = (
         IsAuthenticated, (
-                    IsProgramOwner | IsProgrammingRW | IsTechnicalLogisticRW | IsAdministration | IsDirector | IsRadiologoDeveloper))
+                IsAdministration | IsDirector | IsRadiologoDeveloper |
+                IsProgramOwner | IsProgrammingRW | IsTechnicalLogisticRW
+        )
+    )
 
     def put(self, request, pk):
         program = Program.objects.get(pk=pk)
@@ -94,8 +101,10 @@ class UploadProgramView(APIView):
 class GetUpdateDeleteRSSView(APIView):
     permission_classes = (
         IsAuthenticated, (
-                IsProgrammingRW | IsTechnicalLogisticRW | IsAdministration | IsDirector |
-                IsRadiologoDeveloper))
+                IsAdministration | IsDirector | IsRadiologoDeveloper |
+                IsProgrammingRW | IsTechnicalLogisticRW
+        )
+    )
 
     def get(self, request, pk):
         program = get_object_or_404(Program, pk=pk)
@@ -133,9 +142,12 @@ class GetUpdateDeleteRSSView(APIView):
 
 class GetDeleteArchiveProgramView(APIView):
     permission_classes = (
-        IsAuthenticated,
-        (
-                IsProgramOwner | IsProgrammingRW | IsTechnicalLogisticRW | IsCommunicationMarketingR | IsAdministration | IsDirector | IsRadiologoDeveloper))
+        IsAuthenticated, (
+                IsAdministration | IsDirector | IsRadiologoDeveloper |
+                IsProgrammingRW | IsTechnicalLogisticRW | IsCommunicationMarketingR |
+                IsProgramOwner
+        )
+    )
 
     def get(self, request, pk, date):
         program = get_object_or_404(Program, pk=pk)
@@ -150,7 +162,11 @@ class GetDeleteArchiveProgramView(APIView):
 class GetArchiveContentsView(APIView):
     permission_classes = (
         IsAuthenticated, (
-                IsProgramOwner | IsProgrammingR | IsTechnicalLogisticR | IsCommunicationMarketingR | IsAdministration | IsDirector | IsRadiologoDeveloper))
+                IsAdministration | IsDirector | IsRadiologoDeveloper |
+                IsProgrammingR | IsTechnicalLogisticR | IsCommunicationMarketingR |
+                IsProgramOwner
+        )
+    )
 
     def get(self, request, pk):
         program = get_object_or_404(Program, pk=pk)
@@ -161,7 +177,11 @@ class GetArchiveContentsView(APIView):
 class GetArchiveStatistics(APIView):
     permission_classes = (
         IsAuthenticated, (
-                IsProgramOwner | IsProgrammingR | IsTechnicalLogisticR | IsCommunicationMarketingR | IsAdministration | IsDirector | IsRadiologoDeveloper))
+                IsAdministration | IsDirector | IsRadiologoDeveloper |
+                IsProgrammingR | IsTechnicalLogisticR | IsCommunicationMarketingR |
+                IsProgramOwner
+        )
+    )
 
     def get(self, request):
         stats = RemoteService().get_archive_stats()
