@@ -35,7 +35,8 @@ class ListCreateProgramsTest(TestCase):
                                     author_name="aaa",
                                     full_name="aaaa", id_type="CC",
                                     id_number="123",
-                                    ist_student_options="Y", phone="1234")
+                                    ist_student_options="Y", phone="1234",
+                                    role="DI")
         logged_in_user.save()
         token = RefreshToken.for_user(logged_in_user).access_token
         self.auth_headers = {
@@ -146,7 +147,8 @@ class GetUpdateDeleteProgramsTest(TestCase):
                                     author_name="aaa",
                                     full_name="aaaa", id_type="CC",
                                     id_number="123",
-                                    ist_student_options="Y", phone="1234")
+                                    ist_student_options="Y", phone="1234",
+                                    role="DI")
         logged_in_user.save()
         token = RefreshToken.for_user(logged_in_user).access_token
         self.auth_headers = {
