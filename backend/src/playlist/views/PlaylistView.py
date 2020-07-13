@@ -37,4 +37,4 @@ class GetDeleteTrackView(APIView):
 class GetPlaylistContentsView(APIView):
     def get(self, request):
         file_list = RemoteService().get_playlist_contents()
-        return Response(status=status.HTTP_200_OK, data=json.dumps(file_list))
+        return Response(status=status.HTTP_200_OK, data=file_list)

@@ -80,7 +80,7 @@ class GetUpdateDeleteRSSView(APIView):
         rss_feed_url = program.rss_feed_url
         rss_status = program.rss_feed_status
         return Response(status=status.HTTP_200_OK,
-                        data=json.dumps({'feed_url': rss_feed_url, 'feed_status': rss_status}))
+                        data={'feed_url': rss_feed_url, 'feed_status': rss_status})
 
     def patch(self, request, pk):
         program = get_object_or_404(Program, pk=pk)
@@ -99,7 +99,7 @@ class GetUpdateDeleteRSSView(APIView):
         program.rss_feed_status = new_status
         program.save()
         return Response(status=status.HTTP_201_CREATED,
-                        data=json.dumps({'feed_url': program.rss_feed_url, 'feed_status': program.rss_feed_status}))
+                        data={'feed_url': program.rss_feed_url, 'feed_status': program.rss_feed_status})
 
     def delete(self, request, pk):
         program = get_object_or_404(Program, pk=pk)
@@ -124,19 +124,19 @@ class GetArchiveContentsView(APIView):
     def get(self, request, pk):
         program = get_object_or_404(Program, pk=pk)
         file_list = RemoteService().get_archive_contents(program.normalized_name())
-        return Response(status=status.HTTP_200_OK, data=json.dumps(file_list))
+        return Response(status=status.HTTP_200_OK, data=file_list)
 
 
 class GetArchiveStatistics(APIView):
     def get(self, request):
         stats = RemoteService().get_archive_stats()
-        return Response(status=status.HTTP_200_OK, data=json.dumps(stats))
+        return Response(status=status.HTTP_200_OK, data=stats)
 
 class GetProgramAlreadyUploadedDates(APIView):
     def get(self, request, pk):
         program = Program.objects.get(pk=pk)
         dates = RemoteService().get_uploaded_dates(program)
-        return Response(status=status.HTTP_200_OK, data=json.dumps(dates))
+        return Response(status=status.HTTP_200_OK, data=dates)
 
 class GetWeeklySchedule(APIView):
     def get(self, request):
