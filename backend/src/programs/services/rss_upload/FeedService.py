@@ -1,17 +1,16 @@
+import re
+from dataclasses import dataclass
+from datetime import timedelta, date, datetime
+from operator import attrgetter
+from time import struct_time
+
+import feedparser
+import requests
+from django.conf import settings
+
 from programs.models import Program
 from programs.services.processing.ProcessingService import ProcessingService
 
-from django.conf import settings
-from dataclasses import dataclass
-import feedparser
-import requests
-import re  
-import os  
-from datetime import timedelta  
-from collections import namedtuple  
-from operator import attrgetter  
-from time import struct_time
-from datetime import timedelta, date, datetime
 
 class FeedService:
 

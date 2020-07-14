@@ -19,6 +19,7 @@ pydub = "*"
 feedparser = "*"
 paramiko = "*"
 requests = "*"
+django-cors-headers = "*"
 
 [requires]
 python_version = "3.8"

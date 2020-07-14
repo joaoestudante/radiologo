@@ -1,16 +1,15 @@
 import os
-from datetime import datetime
-from traceback import print_tb
 
 from django.conf import settings
+from pydub import AudioSegment
 from pydub.utils import which, mediainfo
 
 from exceptions.radiologoexception import FileBeingProcessedException
-from pydub import AudioSegment
-
 from playlist.services.RemoteService import RemoteService
-from programs.services.processing.FileChecker import FileChecker, IrrecoverableProblemsException
-#uses the FileChecker from programs, consider putting in more general Radiologo 
+from programs.services.processing.FileChecker import FileChecker
+
+
+# uses the FileChecker from programs, consider putting in more general Radiologo
 
 class ProcessingService:
     def __init__(self, path: str, artist: str, title: str):
@@ -44,6 +43,8 @@ class ProcessingService:
             AudioSegment.converter = which('ffmpeg')
             uploaded_file = AudioSegment.from_file(self.uploaded_file_path, self.uploaded_file_path[-3:])
             info = mediainfo(self.uploaded_file_path)
+            
+            self.allowed_durations = [ float(info['duration']) / 60 ] #Music of all durations is permitted
 
             checker = FileChecker(file_path=self.uploaded_file_path, durations=self.allowed_durations,
                                   min_sample_rate=self.min_sample_rate, min_bitrate=self.min_bitrate,

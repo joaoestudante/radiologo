@@ -1,20 +1,16 @@
-import locale
-import os
 import hashlib
-from datetime import datetime
+import os
 import subprocess
+from datetime import datetime
 
-from celery import shared_task
+from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.db import transaction
 from django.template.loader import render_to_string
+from unidecode import unidecode
 
 from exceptions.radiologoexception import NoNewMembersForKeyDocException
 from ..models.keydoc import KeyDoc
-from django.contrib.auth import get_user_model
-from django.template.loaders.filesystem import Loader
-
-from django.conf import settings
-from unidecode import unidecode
 
 
 class KeyDocService:
@@ -47,8 +43,8 @@ class KeyDocService:
 
     def build_context(self) -> dict:
         image_location = settings.KEYS_TEMPLATE_DIR + "rz_banner.png"
-        #locale.setlocale(locale.LC_TIME, "pt_PT.utf8")
-        #today = datetime.now().strftime("%A, %d %B %Y").title()
+        # locale.setlocale(locale.LC_TIME, "pt_PT.utf8")
+        # today = datetime.now().strftime("%A, %d %B %Y").title()
         today = datetime.now().strftime("%d-%m-%Y")
         signature = "{} ({}, {})".format(self.keydoc.creator.author_name, self.keydoc.creator.phone,
                                          self.keydoc.creator.email)
@@ -89,7 +85,7 @@ class KeyDocService:
         subprocess.run(
             ["pandoc", output_dir + "latest_keydoc.md", "-o", output_dir + "latest_keydoc.pdf", "--pdf-engine=xelatex",
              "--template",
-             settings.KEYS_TEMPLATE_DIR  + "eisvogel.tex"])
+             settings.KEYS_TEMPLATE_DIR + "eisvogel.tex"])
         return output_dir + "latest_keydoc.pdf"
 
     def checkNeedsGeneration(self, previous_doc, new_doc):

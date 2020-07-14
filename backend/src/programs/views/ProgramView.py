@@ -1,32 +1,21 @@
-import json
-from datetime import datetime
-
-import paramiko
-from django.conf import settings
-from django.core.validators import URLValidator
-from django.core.exceptions import ValidationError
-from rest_framework.permissions import IsAuthenticated
-
-from rest_framework.views import APIView
-from rest_framework.response import Response
 import rest_framework.status as status
-from rest_framework import authentication, permissions
-
-from exceptions.radiologoexception import InvalidDateFormatForEmissionException, InvalidDateForEmissionException
-from radiologo import celery_app
-from radiologo.permissions import IsRadiologoDeveloper, IsProgrammingRW, IsProgramOwner, IsTechnicalLogisticRW
-from .. import tasks
-from ..models import Slot
-from ..serializers.ProgramSerializer import ProgramSerializer
-from ..models.program import Program
+from django.conf import settings
+from django.core.exceptions import ValidationError
+from django.core.validators import URLValidator
 from django.shortcuts import get_object_or_404
-
-from ..services.ProgramService import ProgramService
-from ..services.RemoteService import RemoteService
-from ..services.processing.ProcessingService import ProcessingService
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from radiologo.permissions import IsProgrammingR, IsDirector, IsRadiologoDeveloper, IsTechnicalLogisticR, \
     IsCommunicationMarketingR, IsAdministration
+from radiologo.permissions import IsProgrammingRW, IsProgramOwner, IsTechnicalLogisticRW
+from .. import tasks
+from ..models.program import Program
+from ..serializers.ProgramSerializer import ProgramSerializer
+from ..services.ProgramService import ProgramService
+from ..services.RemoteService import RemoteService
+from ..services.processing.ProcessingService import ProcessingService
 
 
 class ListCreateProgramsView(APIView):

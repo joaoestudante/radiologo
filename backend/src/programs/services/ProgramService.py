@@ -31,7 +31,7 @@ class ProgramService:
         return weekday
 
     def get_schedule(self):
-        events = {"normal":[], "rerun":[]}
+        events = {"normal": [], "rerun": []}
         current_week_dates = []
         for i in range(1, 8):
             current_week_dates.append(
@@ -42,7 +42,11 @@ class ProgramService:
                 start = current_week_dates[slot.iso_weekday - 1] + " " + slot.time.strftime("%H:%M")
                 end = current_week_dates[slot.iso_weekday - 1] + " " + slot.end_time()
                 if slot.is_rerun:
-                    events["rerun"].append({"name": slot.program.name, "start": start, "end": end})
+                    events["rerun"].append(
+                        {"name": slot.program.name + " - RE", "description": slot.program.description, "start": start,
+                         "end": end})
                 else:
-                    events["normal"].append({"name": slot.program.name, "start": start, "end": end})
+                    events["normal"].append(
+                        {"name": slot.program.name, "description": slot.program.description, "start": start,
+                         "end": end})
         return events

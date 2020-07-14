@@ -1,10 +1,10 @@
 from rest_framework.permissions import BasePermission
-from rest_framework.views import APIView
 
 from programs.models import Program
 
 allowed_read_methods = ("GET", "HEAD", "OPTIONS")
 allowed_write_methods = ("GET", "HEAD", "OPTIONS", "POST", "PUT", "DELETE")
+
 
 class IsProgrammingR(BasePermission):
     def has_permission(self, request, view):
@@ -68,6 +68,7 @@ class IsProgramOwner(BasePermission):
         if request.user in list(requested_program.authors.all()):
             return True
         return False
+
 
 class IsRadiologoDeveloper(BasePermission):
     def has_permission(self, request, view):

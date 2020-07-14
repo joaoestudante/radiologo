@@ -1,17 +1,16 @@
 from datetime import datetime
 
-from ..models import Slot
-from ..models.slot import allowed_slots
-from exceptions.radiologoexception import RadiologoException, StartingTimeConflictException, \
+from exceptions.radiologoexception import StartingTimeConflictException, \
     SlotDurationConflictException
 from ..models import Program
+from ..models import Slot
 
 
 class SlotService:
     def __init__(self):
         pass
 
-    def create_slot(self, iso_weekday: int, time: datetime.time, program_object: Program, is_rerun:bool):
+    def create_slot(self, iso_weekday: int, time: datetime.time, program_object: Program, is_rerun: bool):
         self.check_occupied_slot(iso_weekday, time)
         self.check_next_slots(iso_weekday, time, program_object)
         self.check_prev_slots(iso_weekday, time, program_object)

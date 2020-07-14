@@ -38,7 +38,7 @@ class FileChecker:
         if self.do_normalization:
             print("\t\t* Applying 2 pass loudnorm...")
             loudnorm_list = self.build_loudnorm_list(normalization_data)
-            loudnorm_list[-1] += "," + str(measured_duration) #Include duration correction
+            loudnorm_list[-1] += ", " + "atempo=" + str(measured_duration) #Include duration correction
             return default_params + loudnorm_list
         else:
             return default_params
