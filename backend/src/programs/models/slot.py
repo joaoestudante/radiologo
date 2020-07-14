@@ -1,6 +1,8 @@
+from datetime import datetime, timedelta
+
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from datetime import datetime, timedelta
+
 from .program import Program
 
 # This is our own format - it is not a standard
@@ -83,10 +85,10 @@ class Slot(models.Model):
 
     def __str__(self):
         if self.is_rerun:
-            return self.get_weekday_display() + ", " + self.time.strftime("%H:%M") + " - (" + str(self.program) + ", rerun)"
+            return self.get_weekday_display() + ", " + self.time.strftime("%H:%M") + " - (" + str(
+                self.program) + ", rerun)"
         else:
             return self.get_weekday_display() + ", " + self.time.strftime("%H:%M") + " - (" + str(self.program) + ")"
-
 
     @staticmethod
     def iso_to_custom_format(iso: int):
@@ -151,5 +153,6 @@ class Slot(models.Model):
 
     def end_time(self):
         now = datetime.now()
-        return (datetime(year=now.year, month=now.month, day=now.day, hour=self.time.hour, minute=self.time.minute) + timedelta(
+        return (datetime(year=now.year, month=now.month, day=now.day, hour=self.time.hour,
+                         minute=self.time.minute) + timedelta(
             minutes=self.program.max_duration)).strftime("%H:%M")

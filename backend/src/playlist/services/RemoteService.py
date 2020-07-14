@@ -1,18 +1,10 @@
-import os
-import re
-import subprocess
-from datetime import datetime, timedelta
 from stat import S_ISREG
 
 import paramiko
-import requests
 from django.conf import settings
-from django.http import StreamingHttpResponse
 
 from exceptions.radiologoexception import FileAlreadyUploadedException, FileNotDeletedException, \
     FileDoesNotExistException, CouldNotConnectToServerException
-
-import collections
 
 
 class RemoteService:
@@ -44,7 +36,7 @@ class RemoteService:
         return
 
     def download_playlist_file(self, filename: str):
-        #Not implemented, previous implementation does not use SFTP
+        # Not implemented, previous implementation does not use SFTP
         return False
 
     def get_playlist_contents(self):
@@ -63,9 +55,9 @@ class RemoteService:
             pass
         finally:
             self.close_connections()
-            return { i : file_list[i] for i in range(0, len(file_list) ) }
+            return {i: file_list[i] for i in range(0, len(file_list))}
 
-    def delete_playlist_file(self, filename: str): 
+    def delete_playlist_file(self, filename: str):
         file = settings.PLAYLIST_SERVER_UPLOAD_DIRECTORY + filename
 
         self.open_ssh_playlist()
@@ -90,7 +82,8 @@ class RemoteService:
             try:
                 self.ssh_client = paramiko.SSHClient()
                 self.ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-                self.ssh_client.connect(hostname=settings.PLAYLIST_SERVER_IP, username=settings.PLAYLIST_SERVER_USERNAME,
+                self.ssh_client.connect(hostname=settings.PLAYLIST_SERVER_IP,
+                                        username=settings.PLAYLIST_SERVER_USERNAME,
                                         password=settings.PLAYLIST_SERVER_PASSWORD)
                 print("SSH connection to playlist server established.")
                 return

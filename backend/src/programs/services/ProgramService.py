@@ -31,7 +31,7 @@ class ProgramService:
         return weekday
 
     def get_schedule(self):
-        events = {"normal":[], "rerun":[]}
+        events = {"normal": [], "rerun": []}
         current_week_dates = []
         for i in range(1, 8):
             current_week_dates.append(

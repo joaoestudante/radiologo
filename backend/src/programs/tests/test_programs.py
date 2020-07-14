@@ -1,12 +1,10 @@
+from datetime import datetime, timedelta, date
+
 from django.test import TestCase
-from ..models import Slot, Program
-from users.models import CustomUser
+
 from users.services.UserService import UserService
 from ..services.ProgramService import ProgramService
 from ..services.SlotService import SlotService
-
-from datetime import datetime, timedelta, date
-import exceptions.radiologoexception as re
 
 
 class ProgramTest(TestCase):
