@@ -16,7 +16,7 @@
       padless
     >
       <v-row justify="center" no-gutters>
-        <v-btn text rounded class="my-2"> Contactos </v-btn>
+        <v-btn text class="my-2"> Contactos </v-btn>
       </v-row>
       <v-col class="grey lighten-4 py-2 text-center" cols="12">
         {{ new Date().getFullYear() }} — <strong>Rádio Zero</strong>
