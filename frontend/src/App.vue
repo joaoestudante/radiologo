@@ -8,8 +8,17 @@
       </v-container>
     </v-main>
 
-    <v-footer app absolute class="font-weight-medium">
-      <v-col class="text-center" cols="12">
+    <v-footer
+      app
+      absolute
+      class="font-weight-medium"
+      color="grey lighten-3"
+      padless
+    >
+      <v-row justify="center" no-gutters>
+        <v-btn text rounded class="my-2"> Contactos </v-btn>
+      </v-row>
+      <v-col class="grey lighten-4 py-2 text-center" cols="12">
         {{ new Date().getFullYear() }} — <strong>Rádio Zero</strong>
       </v-col>
     </v-footer>
