@@ -3,6 +3,7 @@
     <top-bar />
 
     <v-main>
+      <Loading />
       <v-container fluid>
         <router-view></router-view>
       </v-container>
@@ -27,10 +28,11 @@
 
 <script lang="ts">
 import TopBar from "@/components/TopBar.vue";
+import Loading from "@/components/Loading.vue";
 import { Component, Vue } from "vue-property-decorator";
 
 @Component({
-  components: { TopBar },
+  components: { TopBar, Loading },
 })
 export default class App extends Vue {}
 </script>

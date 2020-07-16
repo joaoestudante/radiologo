@@ -1,6 +1,6 @@
 <template>
   <v-progress-linear
-    :active="isLoading"
+    :active="loading"
     indeterminate
     color="black"
     background-opacity="0"
@@ -19,7 +19,6 @@ export default class Loading extends Vue {
     this.$store.watch(
       (state, getters) => getters.getLoading,
       () => {
-        console.log("loading changed");
         this.loading = this.$store.getters.getLoading;
       }
     );
