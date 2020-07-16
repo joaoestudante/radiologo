@@ -1,3 +1,4 @@
+import collections
 import os
 import re
 import subprocess
@@ -11,8 +12,6 @@ from django.http import StreamingHttpResponse
 from exceptions.radiologoexception import FileAlreadyUploadedException, FileNotDeletedException, \
     FileDoesNotExistException, CouldNotConnectToServerException
 from programs.models import Program
-
-import collections
 
 
 class RemoteService:
@@ -211,7 +210,7 @@ class RemoteService:
                 self.ssh_client = paramiko.SSHClient()
                 self.ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
                 self.ssh_client.connect(hostname=settings.UPLOAD_SERVER_IP, username=settings.UPLOAD_SERVER_USERNAME,
-                                   password=settings.UPLOAD_SERVER_PASSWORD)
+                                        password=settings.UPLOAD_SERVER_PASSWORD)
                 print("SSH connection to upload/emission server established.")
                 return
             except Exception:

@@ -1,16 +1,15 @@
 import os
-from datetime import datetime
-from traceback import print_tb
 
 from django.conf import settings
+from pydub import AudioSegment
 from pydub.utils import which, mediainfo
 
 from exceptions.radiologoexception import FileBeingProcessedException
-from pydub import AudioSegment
-
 from playlist.services.RemoteService import RemoteService
-from programs.services.processing.FileChecker import FileChecker, IrrecoverableProblemsException
-#uses the FileChecker from programs, consider putting in more general Radiologo 
+from programs.services.processing.FileChecker import FileChecker
+
+
+# uses the FileChecker from programs, consider putting in more general Radiologo
 
 class ProcessingService:
     def __init__(self, path: str, artist: str, title: str):

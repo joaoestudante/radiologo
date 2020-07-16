@@ -9,6 +9,7 @@ from django.core.signing import BadSignature
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from rest_framework import status, generics
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -16,10 +17,12 @@ from exceptions.radiologoexception import BadInviteTokenException, InvalidTokenE
     InviteAlreadyAcceptedException
 from users.models import Invite
 from users.serializers.InviteSerializer import InviteSerializer
+from radiologo.permissions import IsProgrammingR, IsDirector, IsRadiologoDeveloper, IsTechnicalLogisticR, \
+    IsCommunicationMarketingR, IsAdministration
 
 
 class InviteAcceptView(APIView):
-    permission_classes = []
+    permission_classes = ()
 
     def post(self, request, *args, **kwargs):
         url_token = kwargs["token"]
@@ -62,10 +65,24 @@ class InviteAcceptView(APIView):
 
 
 class InviteListView(generics.ListAPIView):
+    permission_classes = (
+        IsAuthenticated, (
+                IsAdministration | IsDirector | IsRadiologoDeveloper |
+                IsProgrammingR | IsTechnicalLogisticR
+        )
+    )
+
     serializer_class = InviteSerializer
     queryset = Invite.objects.all()
 
+
 class InviteResendView(APIView):
+    permission_classes = (
+        IsAuthenticated, (
+                IsAdministration | IsDirector | IsRadiologoDeveloper |
+                IsProgrammingR | IsTechnicalLogisticR
+        )
+    )
 
     def post(self, request):
         user = get_user_model().objects.get(author_name=request.data["invited_user_author_name"])

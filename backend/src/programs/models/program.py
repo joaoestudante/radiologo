@@ -1,10 +1,10 @@
+from datetime import timedelta, date
 from functools import cached_property
 
-from django.db import models
 from django.contrib.auth import get_user_model
+from django.db import models
 from django.utils import timezone
 from unidecode import unidecode
-from datetime import timedelta, date, datetime
 
 DURATIONS = (
     (28, '28'),

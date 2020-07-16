@@ -10,7 +10,8 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CustomUser
-        fields = ['author_name',
+        fields = ['id',
+                  'author_name',
                   'full_name',
                   'id_type',
                   'id_number',

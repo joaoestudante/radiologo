@@ -1,6 +1,5 @@
-import os
-
 import configparser
+import os
 from datetime import timedelta
 
 config = configparser.RawConfigParser()
@@ -17,7 +16,8 @@ SECRET_KEY = config.get("AppSettings", "SecretKey")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config.get("AppSettings", "Debug")
 
-ALLOWED_HOSTS = []
+CORS_ORIGIN_ALLOW_ALL = True
+ALLOWED_HOSTS = ["*"]
 
 BASE_FRONTEND_URL = "http://localhost:8080" if DEBUG else "https://radiologo.radiozero.pt"
 
@@ -35,19 +35,20 @@ INSTALLED_APPS = [
     'users',
     'exceptions',
     'keys',
-    'django_rest_passwordreset'
+    'django_rest_passwordreset',
+    'corsheaders'
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
-
 ROOT_URLCONF = 'radiologo.urls'
 
 TEMPLATES = [
@@ -70,6 +71,8 @@ TEMPLATES = [
 KEYS_TEMPLATE_DIR = os.path.join(BASE_DIR, 'radiologo/resources/keys_templates/')
 KEYDOC_MD = "keydoc.md"
 FILE_UPLOAD_DIR = os.path.join(BASE_DIR, 'programs/uploaded/')
+if not os.path.isdir(FILE_UPLOAD_DIR):
+    os.mkdir(FILE_UPLOAD_DIR)
 
 WSGI_APPLICATION = 'radiologo.wsgi.application'
 
@@ -181,7 +184,7 @@ SIMPLE_JWT = {
 }
 
 # Celery
-CELERY_BROKER_URL='redis://redis:6379/0'
+CELERY_BROKER_URL = 'redis://redis:6379/0'
 
 # Uploads
 ARCHIVE_SERVER_IP = config.get("Servers", "ArchiveServer.ip")
