@@ -4,7 +4,7 @@
 
     <v-main>
       <Loading />
-      <v-container fluid>
+      <v-container fill-height fluid>
         <router-view></router-view>
       </v-container>
     </v-main>
