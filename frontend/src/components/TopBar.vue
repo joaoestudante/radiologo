@@ -1,6 +1,6 @@
 <template>
   <nav>
-    <v-app-bar app hide-on-scroll="">
+    <v-app-bar app>
       <v-app-bar-nav-icon
         @click.stop="drawer = !drawer"
         class="hidden-md-and-up"

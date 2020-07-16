@@ -16,10 +16,25 @@ httpClient.interceptors.request.use(
         config.headers.Authorization = `Bearer ${token}`;
       }
     }
+    Store.commit("startLoading");
 
     return config;
   },
-  (error) => Promise.reject(error)
+  (error) => {
+    Store.commit("startLoading");
+    Promise.reject(error);
+  }
+);
+
+httpClient.interceptors.response.use(
+  (config) => {
+    Store.commit("stopLoading");
+    return config;
+  },
+  (error) => {
+    Store.commit("stopLoading");
+    Promise.reject(error);
+  }
 );
 
 export default class BackendServices {
