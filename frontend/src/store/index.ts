@@ -15,7 +15,12 @@ export default new Vuex.Store({
       state.loading = true;
     },
   },
-  actions: {},
+  actions: {
+    login: ({ commit, dispatch }, user) => {
+      console.log(user.email);
+      console.log(user.password);
+    },
+  },
   getters: {
     getLoading(state): boolean {
       return state.loading;
