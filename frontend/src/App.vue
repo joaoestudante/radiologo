@@ -34,6 +34,8 @@ export default class App extends Vue {
     const setVuetifyTheme = (value: boolean) => {
       this.$vuetify.theme.dark = value;
     };
+    if (window.matchMedia("(prefers-color-scheme: dark)").matches)
+      setVuetifyTheme(true);
     window
       .matchMedia("(prefers-color-scheme: dark)")
       .addEventListener("change", function(e) {
