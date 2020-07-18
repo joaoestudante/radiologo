@@ -3,7 +3,6 @@ from __future__ import absolute_import, unicode_literals
 import os
 
 from celery import Celery
-
 # set the default Django settings module for the 'celery' program.
 from celery.schedules import crontab
 
@@ -17,6 +16,10 @@ celery_app.autodiscover_tasks()
 celery_app.conf.beat_schedule = {
     'daily-alignment': {
         'task': 'programs.tasks.do_alignment',
-        'schedule': crontab(minute='50', hour='22'),
+        'schedule': crontab(minute='10', hour='06'),
     },
+    'rss-upload': {
+        'task': 'programs.tasks.upload_from_feed',
+        'schedule': crontab(minute='10', hour='07')
+    }
 }
