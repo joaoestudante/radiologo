@@ -46,25 +46,24 @@
 </template>
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
+import { AxiosError } from "axios";
 @Component
 export default class Login extends Vue {
   email = "";
   password = "";
   alert = false;
-  success = false;
   errorMessage = "";
   login() {
     const email = this.email;
     const password = this.password;
     this.$store
       .dispatch("login", { email, password })
-      .then(() => {
+      .then(function(this: Login) {
         this.$router.push("/");
       })
-      .catch(function(error) {
+      .catch(function(this: Login, error: AxiosError) {
         this.errorMessage = "";
-        //console.log(error.response);
-        this.errorMessage = error.response.data.non_field_errors[0];
+        this.errorMessage = error.response!.data.detail;
         this.alert = true;
       });
   }
