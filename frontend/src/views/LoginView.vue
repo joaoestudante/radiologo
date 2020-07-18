@@ -63,7 +63,11 @@ export default class Login extends Vue {
       })
       .catch(function(this: Login, error: AxiosError) {
         this.errorMessage = "";
-        this.errorMessage = error.response!.data.detail;
+        if (error.response != undefined)
+          this.errorMessage = error.response.data.detail;
+        else
+          this.errorMessage =
+            "Houve um erro inesperado ao efectuar login. Tente novamente.";
         this.alert = true;
       });
   }
