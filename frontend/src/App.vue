@@ -27,7 +27,19 @@ import Loading from "@/components/Loading.vue";
 import { Component, Vue } from "vue-property-decorator";
 
 @Component({
-  components: { TopBar, Loading },
+  components: { TopBar, Loading }
 })
-export default class App extends Vue {}
+export default class App extends Vue {
+  created() {
+    const setVuetifyTheme = (value: boolean) => {
+      this.$vuetify.theme.dark = value;
+    };
+    window
+      .matchMedia("(prefers-color-scheme: dark)")
+      .addEventListener("change", function(e) {
+        console.log(`changed to ${e.matches ? "dark" : "light"} mode`);
+        setVuetifyTheme(e.matches);
+      });
+  }
+}
 </script>
