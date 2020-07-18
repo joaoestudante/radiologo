@@ -16,6 +16,7 @@ from ..serializers.ProgramSerializer import ProgramSerializer
 from ..services.ProgramService import ProgramService
 from ..services.RemoteService import RemoteService
 from ..services.processing.ProcessingService import ProcessingService
+from ..services.rss_upload.FeedService import FeedService
 
 
 class ListCreateProgramsView(APIView):
@@ -104,22 +105,20 @@ class GetUpdateDeleteRSSView(APIView):
 
     def patch(self, request, pk):
         program = get_object_or_404(Program, pk=pk)
-        # TODO: Move data checks and integration to serialization
         new_url = request.data['feed_url']
         new_status = request.data['feed_status']
         try:
+            _, feed_name = FeedService.list_episodes_in_podcast(new_url)
             assert type(new_status) is bool
-            validate = URLValidator()
-            validate(new_url)
-        except ValidationError:
-            return Response(status=status.HTTP_406_NOT_ACCEPTABLE)
-        except AssertionError:
+        except Exception:
             return Response(status=status.HTTP_406_NOT_ACCEPTABLE)
         program.rss_feed_url = new_url
         program.rss_feed_status = new_status
         program.save()
         return Response(status=status.HTTP_201_CREATED,
-                        data={'feed_url': program.rss_feed_url, 'feed_status': program.rss_feed_status})
+                        data={ 'feed_name': feed_name,
+                        'feed_url': program.rss_feed_url, 
+                        'feed_status': program.rss_feed_status})
 
     def delete(self, request, pk):
         program = get_object_or_404(Program, pk=pk)

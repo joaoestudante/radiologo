@@ -25,7 +25,8 @@ class FeedService:
         self.name = ""
         self.episodeList = []
 
-    def _uniformize_duration(self, string):
+    @staticmethod
+    def _uniformize_duration(string):
         """ INTERNAL function: Parses duration information into
         timedelta object which can be stringified using str()
         or manipulated to other formats (show in seconds, etc.) """
@@ -47,26 +48,28 @@ class FeedService:
             # duration was specified in hours:minutes:seconds
             return timedelta(hours=int(groupings[0]), minutes=int(groupings[1]), seconds=int(groupings[2]))
 
-    def list_episodes_in_podcast(self) -> tuple:
+    @staticmethod
+    def list_episodes_in_podcast(feed_url) -> tuple:
         """ Retrieve a list of episodes at the podcast feed
         located in _feedurl_.
         RETURNS [Episode] as list of Episode, podcastname as str"""
 
         # Download and parse feed
-        parsed = feedparser.parse(self.feed_url)
+        parsed = feedparser.parse(feed_url)
 
-        self.name = parsed.feed.title
+        name = parsed.feed.title
 
         # Extract episode list
-        self.episodelist = [Episode(title=episode.title,
+        episodelist = [Episode(title=episode.title,
                                     duration=self._uniformize_duration(episode.itunes_duration),
                                     date=episode.published_parsed,
                                     link=Link(href=episode.enclosures[0].href, type=episode.enclosures[0].type))
                             for episode in parsed.entries]
-        self.episodelist.sort(reverse=True, key=attrgetter('date'))
-        return self.episodelist, self.name
+        episodelist.sort(reverse=True, key=attrgetter('date'))
+        return episodelist, name
 
-    def download_episode(self, destpath, episode):
+    @staticmethod
+    def download_episode(destpath, episode) -> str:
         """ Downloads an episode _episode_ (Episode from episodelist)
         to the respective location specified in _destpath_
         which should not contain any extension, since it is
@@ -102,7 +105,7 @@ class FeedService:
         if self.feed_status == True and current_day == upload_day: # REQUIRES daily scheduled running
             print("\t\t- Automatic RSS Feed Upload for "+ self.normalized_program_name)
             # Retrieve Episode List
-            episodes, podcastname = self.list_episodes_in_podcast()
+            episodes, self.name = self.list_episodes_in_podcast(self.feed_url)
             print("\t\t- Podcast name: "+ self.name)
             # Download last episode
             destpath = self.download_episode(settings.FILE_UPLOAD_DIR + "uploaded_feed_" + self.normalized_program_name, episodes[0])
