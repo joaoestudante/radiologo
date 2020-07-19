@@ -15,14 +15,21 @@
         </v-btn>
       </v-toolbar-title>
 
-      <v-toolbar-items class="hidden-sm-and-down" hide-details>
+      <v-toolbar-items
+        class="hidden-sm-and-down"
+        hide-details
+        v-if="$store.getters.getUser != null"
+      >
         <v-menu offset-y transition="slide-y-transition" open-on-hover>
           <template v-slot:activator="{ on }">
             <v-btn text v-on="on">
               Programa
             </v-btn>
           </template>
-          <v-list>
+          <v-list
+            v-for="program of $store.getters.getUser.programSet"
+            :key="program.id"
+          >
             <v-list-item>
               <v-list-item-content>
                 <v-list-item-title>Upload</v-list-item-title>
@@ -70,7 +77,18 @@
 
       <v-spacer />
 
-      <v-btn text class="align-center" to="/login/">
+      <v-btn
+        v-if="$store.getters.getUser != null"
+        text
+        class="align-center"
+        to="/profile/"
+      >
+        {{ $store.getters.getUser.authorName }}
+      </v-btn>
+      <v-btn v-if="$store.getters.getUser != null" text @click="logout">
+        Sair
+      </v-btn>
+      <v-btn v-else text class="align-center" to="/login/">
         Login
       </v-btn>
     </v-app-bar>
@@ -84,5 +102,9 @@ import { Component, Vue } from "vue-property-decorator";
 @Component
 export default class TopBar extends Vue {
   drawer = false;
+  logout() {
+    this.$store.commit("logout");
+    this.$router.push({ name: "Login" });
+  }
 }
 </script>

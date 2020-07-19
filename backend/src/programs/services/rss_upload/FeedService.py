@@ -16,16 +16,17 @@ class FeedService:
 
     def __init__(self, program_pk):
         self.program_pk = program_pk
-        self.program =  Program.objects.get(pk=self.program_pk)
+        self.program = Program.objects.get(pk=self.program_pk)
         self.normalized_program_name = self.program.normalized_name()
         self.feed_url = self.program.rss_feed_url
         self.feed_status = self.program.rss_feed_status
         self.next_emission_date = self.program.next_upload_date()
-        self.next_emission_date_dt = datetime.strptime(self.next_emission_date,"%Y-%m-%d").date()
+        self.next_emission_date_dt = datetime.strptime(self.next_emission_date, "%Y-%m-%d").date()
         self.name = ""
         self.episodeList = []
 
-    def _uniformize_duration(self, string):
+    @staticmethod
+    def _uniformize_duration(string):
         """ INTERNAL function: Parses duration information into
         timedelta object which can be stringified using str()
         or manipulated to other formats (show in seconds, etc.) """
@@ -47,26 +48,28 @@ class FeedService:
             # duration was specified in hours:minutes:seconds
             return timedelta(hours=int(groupings[0]), minutes=int(groupings[1]), seconds=int(groupings[2]))
 
-    def list_episodes_in_podcast(self) -> tuple:
+    @staticmethod
+    def list_episodes_in_podcast(feed_url) -> tuple:
         """ Retrieve a list of episodes at the podcast feed
         located in _feedurl_.
         RETURNS [Episode] as list of Episode, podcastname as str"""
 
         # Download and parse feed
-        parsed = feedparser.parse(self.feed_url)
+        parsed = feedparser.parse(feed_url)
 
-        self.name = parsed.feed.title
+        name = parsed.feed.title
 
         # Extract episode list
-        self.episodelist = [Episode(title=episode.title,
-                                    duration=self._uniformize_duration(episode.itunes_duration),
-                                    date=episode.published_parsed,
-                                    link=Link(href=episode.enclosures[0].href, type=episode.enclosures[0].type))
-                            for episode in parsed.entries]
-        self.episodelist.sort(reverse=True, key=attrgetter('date'))
-        return self.episodelist, self.name
+        episodelist = [Episode(title=episode.title,
+                               duration=FeedService._uniformize_duration(episode.itunes_duration),
+                               date=episode.published_parsed,
+                               link=Link(href=episode.enclosures[0].href, type=episode.enclosures[0].type))
+                       for episode in parsed.entries]
+        episodelist.sort(reverse=True, key=attrgetter('date'))
+        return episodelist, name
 
-    def download_episode(self, destpath, episode):
+    @staticmethod
+    def download_episode(destpath, episode) -> str:
         """ Downloads an episode _episode_ (Episode from episodelist)
         to the respective location specified in _destpath_
         which should not contain any extension, since it is
@@ -97,21 +100,25 @@ class FeedService:
 
     def download_last_episode(self):
         """Automatically download last episode"""
-        current_day = date.today() 
-        upload_day = self.next_emission_date_dt + timedelta(days=-1) # Upload the day before airing
-        if self.feed_status == True and current_day == upload_day: # REQUIRES daily scheduled running
-            print("\t\t- Automatic RSS Feed Upload for "+ self.normalized_program_name)
+        current_day = date.today()
+        upload_day = self.next_emission_date_dt + timedelta(days=-1)  # Upload the day before airing
+        if self.feed_status == True and current_day == upload_day:  # REQUIRES daily scheduled running
+            print("\t\t- Automatic RSS Feed Upload for " + self.normalized_program_name)
             # Retrieve Episode List
-            episodes, podcastname = self.list_episodes_in_podcast()
-            print("\t\t- Podcast name: "+ self.name)
+            episodes, self.name = self.list_episodes_in_podcast(self.feed_url)
+            print("\t\t- Podcast name: " + self.name)
             # Download last episode
-            destpath = self.download_episode(settings.FILE_UPLOAD_DIR + "uploaded_feed_" + self.normalized_program_name, episodes[0])
-            print("\t\t- Retrieved episode with title \""+ episodes[0].title + "\" dated from " + str(episodes[0].date))
+            destpath = self.download_episode(settings.FILE_UPLOAD_DIR + "uploaded_feed_" + self.normalized_program_name,
+                                             episodes[0])
+            print(
+                "\t\t- Retrieved episode with title \"" + episodes[0].title + "\" dated from " + str(episodes[0].date))
             # Process the file
-            service = ProcessingService(path=destpath, program_pk=self.program_pk, emission_date=self.next_emission_date,
-                                author_name=self.name, email=settings.ADMIN_EMAIL)
+            service = ProcessingService(path=destpath, program_pk=self.program_pk,
+                                        emission_date=self.next_emission_date_dt.strftime("%Y%m%d"),
+                                        author_name=self.name, email=settings.ADMIN_EMAIL)
             service.process()
         return True
+
 
 # Tests
 
@@ -140,10 +147,10 @@ class Link:
     href: str
     type: str
 
+
 @dataclass
 class Episode:
     title: str
     duration: timedelta
     date: struct_time
     link: Link
-

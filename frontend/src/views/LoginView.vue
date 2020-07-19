@@ -53,6 +53,8 @@ export default class Login extends Vue {
   alert = false;
   errorMessage = "";
   login() {
+    this.alert = false;
+    this.errorMessage = "";
     const email = this.email;
     const password = this.password;
     this.$store
