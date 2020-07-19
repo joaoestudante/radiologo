@@ -10,6 +10,8 @@ class UserProgramField(serializers.RelatedField):
         from programs.serializers.ProgramSerializer import ProgramSerializer
         return ProgramSerializer(value).data
 
+    def to_internal_value(self, data):
+        return data["id"]
 
 class UserSerializer(serializers.ModelSerializer):
     program_set = UserProgramField(many=True, queryset=Program.objects.all())

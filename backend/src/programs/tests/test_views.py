@@ -174,7 +174,10 @@ class GetUpdateDeleteProgramsTest(TestCase):
                 "time": "00:32"
             }],
             "authors": [
-                1
+                {
+                    "id":1,
+                    "author_name":"doesn't matter"
+                }
             ]
         }), content_type='application/json', **self.auth_headers)
 
