@@ -6,6 +6,12 @@ There are 3 main instances we need to convert:
 CustomUser -> CustomUser
 Programas -> Programs
 Days -> Slots
+
+HOW TO USE
+create the Django DB with `pipenv run python manage.py migrate`
+put the old DB file in the src directory and rename it to production.sqlite3
+cd into the src directory, and run:
+`python3 radiologo/tools/radiologo-db-converter.py`
 """
 import sqlite3
 
@@ -18,10 +24,10 @@ class DBConverter:
     def do_conversion(self):
         old_db = sqlite3.connect(self.old_db_path)
         new_db = sqlite3.connect(self.new_db_path)
-        # self.convert_users(old_db, new_db)
-        # self.convert_programs(old_db, new_db)
-        # self.convert_program_authors(old_db, new_db)
-        # self.convert_slots(old_db, new_db)
+        self.convert_users(old_db, new_db)
+        self.convert_programs(old_db, new_db)
+        self.convert_program_authors(old_db, new_db)
+        self.convert_slots(old_db, new_db)
 
     def convert_users(self, old_db, new_db):
         old_cur = old_db.cursor()
@@ -113,7 +119,7 @@ class DBConverter:
                                                                    ",?" * (len(new_fields) - 1))
         print(new_fields)
         for slot in old_slots_list:
-            new_slot = (slot["id"], slot["day"], slot["time"], slot["programa_associado_id"], False)
+            new_slot = (slot["id"], int(slot["day"])+1, slot["time"], slot["programa_associado_id"], False)
             new_cur.execute(query, new_slot)
         new_db.commit()
 
