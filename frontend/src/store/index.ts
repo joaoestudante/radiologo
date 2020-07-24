@@ -35,6 +35,9 @@ export default new Vuex.Store({
     logout(state) {
       state.user = null;
       state.accessToken = "";
+    },
+    updateUser(state, updatedUser: User) {
+      state.user = updatedUser;
     }
   },
   actions: {

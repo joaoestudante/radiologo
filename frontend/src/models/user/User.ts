@@ -18,7 +18,7 @@ export default class User {
   exitDate: string | undefined;
   isActive!: boolean;
   isRegistered!: boolean;
-  programSet!: Program[];
+  programSet: Program[] = [];
 
   constructor(jsonObj: any) {
     if (jsonObj) {
@@ -40,9 +40,12 @@ export default class User {
       this.isActive = jsonObj.is_active;
       this.isRegistered = jsonObj.is_registered;
       if (jsonObj.program_set) {
-        if (jsonObj.program_set.lenght != 0)
-          this.programSet = jsonObj.program_set;
-      } else this.programSet = [];
+        if (jsonObj.program_set.length != 0) {
+          for (const program of jsonObj.program_set) {
+            this.programSet.push(new Program(program));
+          }
+        }
+      }
     }
   }
 }

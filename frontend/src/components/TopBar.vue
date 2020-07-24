@@ -27,25 +27,24 @@
             </v-btn>
           </template>
           <v-list
-            v-for="program of $store.getters.getUser.programSet"
+            v-for="(program, index) in $store.getters.getUser.programSet"
             :key="program.id"
           >
-            <v-list-item>
-              <v-list-item-content>
-                <v-list-item-title>Upload</v-list-item-title>
-              </v-list-item-content>
-              <v-list-item-icon>
-                <v-icon>backup</v-icon>
-              </v-list-item-icon>
-            </v-list-item>
-            <v-list-item>
-              <v-list-item-content>
-                <v-list-item-title>Arquivo</v-list-item-title>
-              </v-list-item-content>
-              <v-list-item-icon>
-                <v-icon>archive</v-icon>
-              </v-list-item-icon>
-            </v-list-item>
+            <v-divider v-if="index !== 0"></v-divider>
+            <v-subheader>{{ program.name }}</v-subheader>
+            <v-list-item-content>
+              <v-btn
+                text
+                block
+                :to="{ name: 'programs-upload', params: { id: program.id } }"
+                >Upload <v-spacer /> <v-icon>backup</v-icon>
+              </v-btn>
+            </v-list-item-content>
+            <v-list-item-content>
+              <v-btn text block
+                >Arquivo <v-spacer /> <v-icon>archive</v-icon>
+              </v-btn>
+            </v-list-item-content>
           </v-list>
         </v-menu>
         <!-- End of own program menu -->
@@ -104,7 +103,7 @@ export default class TopBar extends Vue {
   drawer = false;
   logout() {
     this.$store.commit("logout");
-    this.$router.push({ name: "Login" });
+    this.$router.push({ name: "login" });
   }
 }
 </script>
