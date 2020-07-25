@@ -48,9 +48,14 @@ httpClient.interceptors.response.use(
 
 export default class BackendServices {
   static async getWeeklySchedule(): Promise<Schedule> {
-    return httpClient.get("/programs/schedule/").then(response => {
-      return response.data;
-    });
+    return httpClient
+      .get("/programs/schedule/")
+      .then(response => {
+        return response.data;
+      })
+      .catch(error => {
+        console.log(error);
+      });
   }
 
   static async login(email: string, password: string): Promise<AuthDto> {
