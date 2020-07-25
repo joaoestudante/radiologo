@@ -155,12 +155,6 @@
           </v-list-item-content>
         </v-list-item>
 
-        <v-list-item to="/administration/members/">
-          <v-list-item-content>
-            Membros
-          </v-list-item-content>
-        </v-list-item>
-
         <v-divider></v-divider>
 
         <v-list-item to="/profile/">
