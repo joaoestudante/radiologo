@@ -1,10 +1,11 @@
+from django.contrib.auth import get_user_model
+from django.db import transaction
 from rest_framework import serializers
+
 from .SlotSerializer import SlotSerializer
 from ..models import Program
 from ..services.ProgramService import ProgramService
 from ..services.SlotService import SlotService
-from django.contrib.auth import get_user_model
-from django.db import transaction
 
 
 class AuthorsField(serializers.RelatedField):
@@ -15,7 +16,6 @@ class AuthorsField(serializers.RelatedField):
         return data["id"]
 
 
-
 class ProgramSerializer(serializers.ModelSerializer):
     slot_set = SlotSerializer(many=True)
     authors = AuthorsField(many=True, queryset=get_user_model().objects.all())
@@ -23,7 +23,8 @@ class ProgramSerializer(serializers.ModelSerializer):
     class Meta:
         model = Program
         fields = ['id', 'name', 'description', 'max_duration', 'first_emission_date', 'comes_normalized',
-                  'ignore_duration_adjustment', 'is_external', 'state', 'slot_set', 'authors']
+                  'ignore_duration_adjustment', 'is_external', 'state', 'slot_set', 'enabled_days', 'next_upload_date',
+                  'authors']
 
     @transaction.atomic
     def create(self, validated_data):
