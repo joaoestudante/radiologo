@@ -17,7 +17,7 @@
           </v-card-text>
           <v-card-actions>
             <v-btn @click="downloadFile" block :disabled="!archiveFileExists"
-              >Download da emissão para o dia {{ date }}</v-btn
+              >Download da emissão para {{ date }}</v-btn
             >
           </v-card-actions>
         </v-card>

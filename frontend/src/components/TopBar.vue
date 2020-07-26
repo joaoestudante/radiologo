@@ -37,22 +37,32 @@
           >
             <v-divider v-if="index !== 0"></v-divider>
             <v-subheader>{{ program.name }}</v-subheader>
-            <v-list-item-content>
-              <v-btn
-                text
-                block
-                :to="{ name: 'programs-upload', params: { id: program.id } }"
-                >Upload <v-spacer /> <v-icon>backup</v-icon>
-              </v-btn>
-            </v-list-item-content>
-            <v-list-item-content>
-              <v-btn
-                text
-                block
-                :to="{ name: 'programs-archive', params: { id: program.id } }"
-                >Arquivo <v-spacer /> <v-icon>archive</v-icon>
-              </v-btn>
-            </v-list-item-content>
+            <v-list-item
+              :to="{
+                name: 'programs-upload',
+                params: { id: program.id }
+              }"
+            >
+              <v-list-item-content>
+                <v-list-item-title>Upload</v-list-item-title>
+              </v-list-item-content>
+              <v-list-item-icon>
+                <v-icon>backup</v-icon>
+              </v-list-item-icon>
+            </v-list-item>
+            <v-list-item
+              :to="{
+                name: 'programs-archive',
+                params: { id: program.id }
+              }"
+            >
+              <v-list-item-content>
+                <v-list-item-title>Arquivo</v-list-item-title>
+              </v-list-item-content>
+              <v-list-item-icon>
+                <v-icon>archive</v-icon>
+              </v-list-item-icon>
+            </v-list-item>
           </v-list>
         </v-menu>
         <!-- End of own program menu -->
@@ -124,19 +134,33 @@
             class="ml-4"
           >
             <v-divider class="mb-3 mt-2" v-if="index !== 0"></v-divider>
-            <p class="text-caption ml-4">{{ program.name }}</p>
-            <v-btn
-              text
-              block
+            <v-subheader>{{ program.name }}</v-subheader>
+            <v-list-item
               :to="{
                 name: 'programs-upload',
                 params: { id: program.id }
               }"
-              >Upload <v-spacer /> <v-icon>backup</v-icon>
-            </v-btn>
-            <v-btn text block
-              >Arquivo <v-spacer /> <v-icon>archive</v-icon>
-            </v-btn>
+            >
+              <v-list-item-content>
+                <v-list-item-title>Upload</v-list-item-title>
+              </v-list-item-content>
+              <v-list-item-icon>
+                <v-icon>backup</v-icon>
+              </v-list-item-icon>
+            </v-list-item>
+            <v-list-item
+              :to="{
+                name: 'programs-archive',
+                params: { id: program.id }
+              }"
+            >
+              <v-list-item-content>
+                <v-list-item-title>Arquivo</v-list-item-title>
+              </v-list-item-content>
+              <v-list-item-icon>
+                <v-icon>archive</v-icon>
+              </v-list-item-icon>
+            </v-list-item>
           </div>
         </v-list-group>
 
