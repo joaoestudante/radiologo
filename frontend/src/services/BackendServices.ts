@@ -4,6 +4,7 @@ import Schedule from "@/models/Schedule";
 import AuthDto from "@/models/user/AuthDto";
 import router from "@/router";
 import User from "@/models/user/User";
+import FileSaver from "file-saver";
 
 const httpClient = axios.create();
 httpClient.defaults.timeout = 100000;
@@ -103,6 +104,26 @@ export default class BackendServices {
       })
       .then(() => {
         return Promise.resolve();
+      });
+  }
+
+  static async getArchiveContents(programId: number): Promise<any> {
+    return httpClient
+      .get("/programs/" + programId + "/archive/")
+      .then(response => {
+        return response.data;
+      });
+  }
+
+  static async getArchive(url: string, outputFilename: string): Promise<any> {
+    httpClient
+      .get(url, {
+        responseType: "blob",
+        timeout: 30000
+      })
+      .then(response => {
+        FileSaver.saveAs(response.data, outputFilename);
+        Promise.resolve();
       });
   }
 }

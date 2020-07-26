@@ -4,6 +4,7 @@ import Slot from "@/models/program/slot";
 export default class Program {
   id!: number;
   name!: string;
+  normalizedName!: string;
   description!: string;
   maxDuration!: number;
   firstEmissionDate!: string;
@@ -20,6 +21,7 @@ export default class Program {
     if (jsonObj) {
       this.id = jsonObj.id;
       this.name = jsonObj.name;
+      this.normalizedName = jsonObj.normalized_name;
       this.description = jsonObj.description;
       this.maxDuration = jsonObj.max_duration;
       this.firstEmissionDate = jsonObj.first_emission_date;

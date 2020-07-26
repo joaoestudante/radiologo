@@ -46,7 +46,10 @@
               </v-btn>
             </v-list-item-content>
             <v-list-item-content>
-              <v-btn text block
+              <v-btn
+                text
+                block
+                :to="{ name: 'programs-archive', params: { id: program.id } }"
                 >Arquivo <v-spacer /> <v-icon>archive</v-icon>
               </v-btn>
             </v-list-item-content>
