@@ -36,7 +36,8 @@ INSTALLED_APPS = [
     'exceptions',
     'keys',
     'django_rest_passwordreset',
-    'corsheaders'
+    'corsheaders',
+    'rest_framework'
 ]
 
 MIDDLEWARE = [
@@ -55,7 +56,8 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [os.path.join(BASE_DIR, 'radiologo/resources/emails_templates'),
-                 os.path.join(BASE_DIR, 'radiologo/resources/keys_templates')],
+                 os.path.join(BASE_DIR, 'radiologo/resources/keys_templates'),
+                 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [

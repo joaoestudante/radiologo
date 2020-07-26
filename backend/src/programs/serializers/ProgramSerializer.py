@@ -22,7 +22,7 @@ class ProgramSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Program
-        fields = ['id', 'name', 'description', 'max_duration', 'first_emission_date', 'comes_normalized',
+        fields = ['id', 'name', 'normalized_name', 'description', 'max_duration', 'first_emission_date', 'comes_normalized',
                   'ignore_duration_adjustment', 'is_external', 'state', 'slot_set', 'enabled_days', 'next_upload_date',
                   'authors']
 
