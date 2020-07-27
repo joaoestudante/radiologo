@@ -2,16 +2,16 @@
   <v-row>
     <v-col>
       <v-row align="center" justify="center">
-        <v-card class="mx-4" max-width="650px">
+        <v-card class="mx-4" :max-width="maxWidthValue">
           <v-toolbar flat>
             <v-toolbar-title v-html="program.name"></v-toolbar-title>
           </v-toolbar>
           <v-divider />
-          <v-card-text align="center">
+          <v-card-text align="center" justify="center" class="px-8">
             <div v-if="progress === '0'">
               <v-row align="start">
-                <p class="text-body-1 ml-3">
-                  Data da emissão:
+                <p class="text-body-1 ml-4">
+                  Data de emissão:
                 </p>
               </v-row>
               <v-date-picker
@@ -23,14 +23,41 @@
                 color="secondary"
                 ref="datePicker"
               ></v-date-picker>
-              <br />
-              <v-file-input
-                label="Ficheiro de emissão"
-                outlined
-                dense
-                show-size
-                v-model="file"
-              ></v-file-input>
+              <v-row class="mt-5" align="start">
+                <p class="text-body-1 ml-4">Ficheiro de emissão:</p>
+              </v-row>
+              <v-row align="center" justify="center" no-gutters>
+                <v-col :cols="file != null ? 11 : 12">
+                  <v-btn
+                    color="secondary"
+                    depressed
+                    block
+                    :loading="isSelecting"
+                    @click="openFileChooser"
+                    max-width="100%"
+                    class="upload"
+                  >
+                    <v-icon left>
+                      cloud_upload
+                    </v-icon>
+                    <span style="text-overflow:ellipsis; overflow: hidden">
+                      {{ buttonText }}
+                    </span>
+                  </v-btn>
+                  <input
+                    ref="uploader"
+                    class="d-none"
+                    type="file"
+                    accept="audio/*"
+                    @change="onFileChanged"
+                  />
+                </v-col>
+                <v-col v-if="file != null">
+                  <v-btn icon @click="file = null">
+                    <v-icon>mdi-close</v-icon>
+                  </v-btn>
+                </v-col>
+              </v-row>
             </div>
             <v-expand-transition>
               <v-progress-circular
@@ -61,9 +88,16 @@
               informações.</v-alert
             >
           </v-card-text>
+          <v-divider></v-divider>
           <v-card-actions>
-            <v-btn v-if="progress === '0'" :loading="loading" @click="upload"
-              >Upload</v-btn
+            <v-btn
+              v-if="progress === '0'"
+              :loading="loading"
+              @click="upload"
+              :disabled="file == null"
+              block
+              raised
+              >Enviar</v-btn
             >
           </v-card-actions>
         </v-card>
@@ -89,6 +123,8 @@ export default class UploadView extends Vue {
   alert = false;
   success = false;
   errorMessage = "";
+  isSelecting = false;
+  defaultButtonText = "Escolher ficheiro";
 
   beforeCreate() {
     const id = this.$route.params.id;
@@ -136,5 +172,39 @@ export default class UploadView extends Vue {
         this.loading = false;
       });
   }
+
+  onFileChanged(e: any) {
+    this.file = e.target.files[0];
+  }
+
+  openFileChooser() {
+    this.isSelecting = true;
+    window.addEventListener(
+      "focus",
+      () => {
+        this.isSelecting = false;
+      },
+      { once: true }
+    );
+
+    this.$refs.uploader.click();
+  }
+
+  get buttonText() {
+    return this.file != null
+      ? this.file.name + " (" + (this.file.size / 1000000).toFixed(2) + " MB)"
+      : this.defaultButtonText;
+  }
+
+  get maxWidthValue() {
+    return this.$vuetify.breakpoint.smAndDown ? "90%" : "60%";
+  }
 }
 </script>
+
+<style>
+.upload > span:nth-child(1) {
+  /* to allow for upload button content overflow management */
+  max-width: 100%;
+}
+</style>

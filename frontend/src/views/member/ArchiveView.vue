@@ -16,47 +16,54 @@
           </v-toolbar>
           <v-divider></v-divider>
           <v-card-text>
-            <v-tabs v-model="tab" fixed-tabs class="mb-3">
-              <v-tab>Calendário</v-tab>
-              <v-tab>Tabela</v-tab>
-            </v-tabs>
-            <v-tabs-items v-model="tab">
-              <v-tab-item>
-                <v-date-picker
-                  v-model="date"
-                  :allowed-dates="allowedDates"
-                  full-width
-                  elevation="3"
-                ></v-date-picker>
-                <v-btn
-                  class="mt-4"
-                  @click="downloadFile('', '')"
-                  block
-                  :disabled="!archiveFileExists"
-                  >Download da emissão de {{ date }}</v-btn
-                >
-              </v-tab-item>
-              <v-tab-item>
-                <v-data-table
-                  style="flex: 1 1 auto"
-                  :headers="headers"
-                  :items="files"
-                  full-width
-                >
-                  <template v-slot:item.file_name="{ item }">
-                    <v-btn
-                      icon
-                      :key="item.file_date"
-                      @click="
-                        downloadFile(item.file_date, item.file_name, item.bytes)
-                      "
-                    >
-                      <v-icon>mdi-download</v-icon>
-                    </v-btn>
-                  </template>
-                </v-data-table>
-              </v-tab-item>
-            </v-tabs-items>
+            <v-container fluid ma-0 pa-0 fill-height>
+              <v-tabs v-model="tab" fixed-tabs class="mb-3" icons-and-text>
+                <v-tab>Calendário <v-icon>mdi-calendar-today</v-icon></v-tab>
+                <v-tab>Tabela <v-icon>mdi-table</v-icon></v-tab>
+              </v-tabs>
+              <v-tabs-items v-model="tab">
+                <v-tab-item>
+                  <v-date-picker
+                    v-model="date"
+                    :allowed-dates="allowedDates"
+                    full-width
+                    elevation="3"
+                    locale="pt-pt"
+                  ></v-date-picker>
+                  <v-btn
+                    class="mt-4"
+                    @click="downloadFile('', '')"
+                    block
+                    :disabled="!archiveFileExists"
+                    >Download da emissão de {{ date }}</v-btn
+                  >
+                </v-tab-item>
+                <v-tab-item>
+                  <v-data-table
+                    style="flex: 1 1 auto"
+                    :headers="headers"
+                    :items="files"
+                    full-width
+                  >
+                    <template v-slot:item.file_name="{ item }">
+                      <v-btn
+                        icon
+                        :key="item.file_date"
+                        @click="
+                          downloadFile(
+                            item.file_date,
+                            item.file_name,
+                            item.bytes
+                          )
+                        "
+                      >
+                        <v-icon>mdi-download</v-icon>
+                      </v-btn>
+                    </template>
+                  </v-data-table>
+                </v-tab-item>
+              </v-tabs-items>
+            </v-container>
           </v-card-text>
         </v-card>
       </v-row>
