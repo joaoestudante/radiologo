@@ -2,7 +2,7 @@
   <v-row>
     <v-col>
       <v-row align="center" justify="center">
-        <v-card class="mx-4" max-width="650px">
+        <v-card class="mx-4" max-width="650px" v-if="program !== null">
           <v-toolbar flat>
             <v-toolbar-title>Arquivo de "{{ program.name }}"</v-toolbar-title>
           </v-toolbar>
@@ -32,7 +32,7 @@ import Program from "@/models/program/program";
 import BackendServices from "@/services/BackendServices";
 @Component
 export default class ArchiveView extends Vue {
-  program: Program | undefined;
+  program: Program | null = null;
   headers = [
     { text: "Data de emissão", value: "display_date", align: "left" },
     { text: "Download", value: "file_name", align: "right" }
@@ -50,11 +50,23 @@ export default class ArchiveView extends Vue {
     for (const program of this.$store.getters.getUser.programSet)
       if (program.id == id) {
         this.program = program;
+        this.getArchiveContents();
       }
+    if (this.program == null) {
+      const hasPermission = true; // check here for permission
+      if (hasPermission) {
+        BackendServices.getProgram(this.$route.params.id).then(program => {
+          this.program = program;
+          this.getArchiveContents();
+        });
+      } else {
+        alert("no permission"); // redirect to 'no permission page' or load a 'no permission' component
+      }
+    }
   }
 
-  created() {
-    if (this.program != undefined)
+  getArchiveContents() {
+    if (this.program != null) {
       BackendServices.getArchiveContents(this.program.id).then(response => {
         for (const file in response) {
           const date: string = response[file].display_date;
@@ -62,6 +74,7 @@ export default class ArchiveView extends Vue {
         }
         this.files = response;
       });
+    }
   }
 
   allowedDates(val: string) {
@@ -78,7 +91,7 @@ export default class ArchiveView extends Vue {
     if (this.archiveFileExists) {
       for (const file of this.files) {
         if (file["display_date"] == value) {
-          if (this.program != undefined) {
+          if (this.program != null) {
             this.archiveFileUrl =
               process.env.VUE_APP_ROOT_API +
               "programs/" +

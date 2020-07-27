@@ -5,6 +5,7 @@ import AuthDto from "@/models/user/AuthDto";
 import router from "@/router";
 import User from "@/models/user/User";
 import FileSaver from "file-saver";
+import Program from "@/models/program/program";
 
 const httpClient = axios.create();
 httpClient.defaults.timeout = 100000;
@@ -36,6 +37,7 @@ httpClient.interceptors.response.use(
     return config;
   },
   error => {
+    console.log(error);
     if (error.response.status === 401) {
       Store.commit("logout");
       Store.commit("stopLoading");
@@ -124,6 +126,14 @@ export default class BackendServices {
       .then(response => {
         FileSaver.saveAs(response.data, outputFilename);
         Promise.resolve();
+      });
+  }
+
+  static async getProgram(programId: string): Promise<Program> {
+    return await httpClient
+      .get("/programs/" + programId + "/")
+      .then(response => {
+        return new Program(response.data);
       });
   }
 }
