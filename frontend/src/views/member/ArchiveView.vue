@@ -1,25 +1,63 @@
 <template>
   <v-row>
+    <v-snackbar v-model="downloadStarted" top right timeout="4000"
+      >Download iniciado...</v-snackbar
+    >
     <v-col>
       <v-row align="center" justify="center">
         <v-card class="mx-4" max-width="650px" v-if="program !== null">
+          <v-progress-linear
+            v-if="downloadPercentage > 0 && downloadPercentage < 100"
+            :value="downloadPercentage"
+            stream
+          ></v-progress-linear>
           <v-toolbar flat>
             <v-toolbar-title>Arquivo de "{{ program.name }}"</v-toolbar-title>
           </v-toolbar>
           <v-divider></v-divider>
           <v-card-text>
-            <v-date-picker
-              v-model="date"
-              :allowed-dates="allowedDates"
-              full-width
-              elevation="3"
-            ></v-date-picker>
+            <v-tabs v-model="tab" fixed-tabs class="mb-3">
+              <v-tab>Calendário</v-tab>
+              <v-tab>Tabela</v-tab>
+            </v-tabs>
+            <v-tabs-items v-model="tab">
+              <v-tab-item>
+                <v-date-picker
+                  v-model="date"
+                  :allowed-dates="allowedDates"
+                  full-width
+                  elevation="3"
+                ></v-date-picker>
+                <v-btn
+                  class="mt-4"
+                  @click="downloadFile('', '')"
+                  block
+                  :disabled="!archiveFileExists"
+                  >Download da emissão de {{ date }}</v-btn
+                >
+              </v-tab-item>
+              <v-tab-item>
+                <v-data-table
+                  style="flex: 1 1 auto"
+                  :headers="headers"
+                  :items="files"
+                  full-width
+                >
+                  <template v-slot:item.file_name="{ item }">
+                    <v-btn
+                      icon
+                      :key="item.file_date"
+                      @click="
+                        downloadFile(item.file_date, item.file_name, item.bytes)
+                      "
+                    >
+                      <v-icon>mdi-download</v-icon>
+                    </v-btn>
+                  </template>
+                </v-data-table>
+              </v-tab-item>
+            </v-tabs-items>
           </v-card-text>
-          <v-card-actions>
-            <v-btn @click="downloadFile" block :disabled="!archiveFileExists"
-              >Download da emissão para {{ date }}</v-btn
-            >
-          </v-card-actions>
         </v-card>
       </v-row>
     </v-col>
@@ -44,8 +82,12 @@ export default class ArchiveView extends Vue {
   archiveFileExists = false;
   archiveFileUrl = "";
   archiveFilename = "";
+  archiveFilesize = 0;
+  tab = null;
+  downloadPercentage = 0;
+  downloadStarted: boolean | null = null;
 
-  beforeCreate() {
+  created() {
     const id = this.$route.params.id;
     for (const program of this.$store.getters.getUser.programSet)
       if (program.id == id) {
@@ -81,8 +123,32 @@ export default class ArchiveView extends Vue {
     return this.uploadedDates.includes(val);
   }
 
-  downloadFile() {
-    BackendServices.getArchive(this.archiveFileUrl, this.archiveFilename);
+  downloadProgress(downloaded: number) {
+    if (this.downloadStarted == null) this.downloadStarted = true;
+    this.downloadPercentage = downloaded;
+  }
+
+  downloadFile(date: string, filename: string, filesize: number) {
+    if (date != "" && this.program != null)
+      // called by table
+      BackendServices.getArchive(
+        process.env.VUE_APP_ROOT_API +
+          "programs/" +
+          this.program.id +
+          "/archive/" +
+          date +
+          "/",
+        filename,
+        filesize,
+        this.downloadProgress
+      );
+    else
+      BackendServices.getArchive(
+        this.archiveFileUrl,
+        this.archiveFilename,
+        this.archiveFilesize,
+        this.downloadProgress
+      );
   }
 
   @Watch("date")
@@ -99,8 +165,8 @@ export default class ArchiveView extends Vue {
               "/archive/" +
               file["file_date"] +
               "/";
-            this.archiveFilename =
-              this.program.normalizedName + file["file_date"] + ".mp3";
+            this.archiveFilename = file["file_name"];
+            this.archiveFilesize = file["bytes"];
           }
         }
       }

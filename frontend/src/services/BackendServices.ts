@@ -12,6 +12,7 @@ httpClient.defaults.timeout = 100000;
 httpClient.defaults.baseURL =
   process.env.VUE_APP_ROOT_API || "http://localhost:8000";
 httpClient.defaults.headers.post["Content-Type"] = "application/json";
+let doLoading = true;
 httpClient.interceptors.request.use(
   config => {
     if (!config.headers.Authorization) {
@@ -21,7 +22,7 @@ httpClient.interceptors.request.use(
         config.headers.Authorization = `Bearer ${token}`;
       }
     }
-    Store.commit("startLoading");
+    if (doLoading) Store.commit("startLoading");
 
     return config;
   },
@@ -117,14 +118,24 @@ export default class BackendServices {
       });
   }
 
-  static async getArchive(url: string, outputFilename: string): Promise<any> {
+  static async getArchive(
+    url: string,
+    outputFilename: string,
+    filesize: number,
+    downloadUpdater: Function
+  ): Promise<any> {
+    doLoading = false;
     httpClient
       .get(url, {
-        responseType: "blob",
-        timeout: 30000
+        timeout: 30000,
+        onDownloadProgress: progressEvent =>
+          downloadUpdater((progressEvent.loaded * 100) / filesize),
+        responseType: "blob"
       })
       .then(response => {
+        console.log(response);
         FileSaver.saveAs(response.data, outputFilename);
+        doLoading = true;
         Promise.resolve();
       });
   }
