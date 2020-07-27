@@ -90,7 +90,8 @@ class RemoteService:
                 file_list.append({
                     "file_date": compact_date,
                     "file_name": file_name,
-                    "display_date": display_date
+                    "display_date": display_date,
+                    "bytes":ftp_client.stat(file_name).st_size
                 })
             file_list = sorted(file_list, key=lambda k: k['file_date'], reverse=True)
 
@@ -200,9 +201,11 @@ class RemoteService:
                                         password=settings.ARCHIVE_SERVER_PASSWORD)
                 print("SSH connection to archive server established.")
                 return
-            except Exception:
+            except Exception as e:
                 print("Could not connect to archive server. Trying again. [Attempt {}/5]".format(tries))
                 tries += 1
+                print(tries)
+                print(e)
         raise CouldNotConnectToServerException
 
     def open_ssh_emission(self):

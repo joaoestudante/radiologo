@@ -5,12 +5,14 @@ import AuthDto from "@/models/user/AuthDto";
 import router from "@/router";
 import User from "@/models/user/User";
 import FileSaver from "file-saver";
+import Program from "@/models/program/program";
 
 const httpClient = axios.create();
 httpClient.defaults.timeout = 100000;
 httpClient.defaults.baseURL =
   process.env.VUE_APP_ROOT_API || "http://localhost:8000";
 httpClient.defaults.headers.post["Content-Type"] = "application/json";
+let doLoading = true;
 httpClient.interceptors.request.use(
   config => {
     if (!config.headers.Authorization) {
@@ -20,7 +22,7 @@ httpClient.interceptors.request.use(
         config.headers.Authorization = `Bearer ${token}`;
       }
     }
-    Store.commit("startLoading");
+    if (doLoading) Store.commit("startLoading");
 
     return config;
   },
@@ -36,6 +38,7 @@ httpClient.interceptors.response.use(
     return config;
   },
   error => {
+    console.log(error);
     if (error.response.status === 401) {
       Store.commit("logout");
       Store.commit("stopLoading");
@@ -115,15 +118,33 @@ export default class BackendServices {
       });
   }
 
-  static async getArchive(url: string, outputFilename: string): Promise<any> {
+  static async getArchive(
+    url: string,
+    outputFilename: string,
+    filesize: number,
+    downloadUpdater: Function
+  ): Promise<any> {
+    doLoading = false;
     httpClient
       .get(url, {
-        responseType: "blob",
-        timeout: 30000
+        timeout: 30000,
+        onDownloadProgress: progressEvent =>
+          downloadUpdater((progressEvent.loaded * 100) / filesize),
+        responseType: "blob"
       })
       .then(response => {
+        console.log(response);
         FileSaver.saveAs(response.data, outputFilename);
+        doLoading = true;
         Promise.resolve();
+      });
+  }
+
+  static async getProgram(programId: string): Promise<Program> {
+    return await httpClient
+      .get("/programs/" + programId + "/")
+      .then(response => {
+        return new Program(response.data);
       });
   }
 }
