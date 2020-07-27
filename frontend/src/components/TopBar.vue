@@ -28,7 +28,7 @@
         >
           <template v-slot:activator="{ on }">
             <v-btn text v-on="on">
-              Gerir programas
+              Meus programas
             </v-btn>
           </template>
           <v-list
