@@ -173,8 +173,10 @@ export default class UploadView extends Vue {
       });
   }
 
-  onFileChanged(e: any) {
-    this.file = e.target.files[0];
+  onFileChanged(e: Event) {
+    const input = e.target as HTMLInputElement;
+    const files = input.files;
+    if (files != null) this.file = files[0];
   }
 
   openFileChooser() {
@@ -186,8 +188,8 @@ export default class UploadView extends Vue {
       },
       { once: true }
     );
-
-    this.$refs.uploader.click();
+    const element: HTMLElement = this.$refs.uploader as HTMLElement;
+    element.click();
   }
 
   get buttonText() {
