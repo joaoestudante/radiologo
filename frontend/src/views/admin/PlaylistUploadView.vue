@@ -143,7 +143,6 @@ export default class PlaylistUploadView extends Vue {
   upload() {
     this.loading = true;
     if (
-      this.program != undefined &&
       this.file != null &&
       this.artist != undefined &&
       this.title != undefined
