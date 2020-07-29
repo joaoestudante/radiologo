@@ -4,7 +4,7 @@ from rest_framework.response import Response
 import rest_framework.status as status
 
 from radiologo.permissions import IsProgrammingR, IsDirector, IsRadiologoDeveloper, IsTechnicalLogisticR, \
-    IsCommunicationMarketingR, IsAdministration
+    IsCommunicationMarketingR, IsAdministration, IsUserR
 from ..serializers.UserSerializer import UserSerializer
 from ..models.user import CustomUser
 
@@ -33,7 +33,8 @@ class GetUpdateDeleteUserView(APIView):
     permission_classes = (
         IsAuthenticated, (
                 IsAdministration | IsDirector | IsRadiologoDeveloper |
-                IsProgrammingR | IsTechnicalLogisticR | IsCommunicationMarketingR
+                IsProgrammingR | IsTechnicalLogisticR | IsCommunicationMarketingR |
+                IsUserR
         )
     )
 

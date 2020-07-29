@@ -5,8 +5,16 @@ from ..services.UserService import UserService
 from programs.models.program import Program
 
 
+class UserProgramField(serializers.RelatedField):
+    def to_representation(self, value):
+        from programs.serializers.ProgramSerializer import ProgramSerializer
+        return ProgramSerializer(value).data
+
+    def to_internal_value(self, data):
+        return data["id"]
+
 class UserSerializer(serializers.ModelSerializer):
-    program_set = serializers.PrimaryKeyRelatedField(many=True, queryset=Program.objects.all())
+    program_set = UserProgramField(many=True, queryset=Program.objects.all())
 
     class Meta:
         model = CustomUser

@@ -5,7 +5,7 @@
     <v-main>
       <Loading />
       <v-container fill-height fluid>
-        <router-view></router-view>
+        <router-view :key="$route.path"></router-view>
       </v-container>
     </v-main>
 
@@ -27,7 +27,21 @@ import Loading from "@/components/Loading.vue";
 import { Component, Vue } from "vue-property-decorator";
 
 @Component({
-  components: { TopBar, Loading },
+  components: { TopBar, Loading }
 })
-export default class App extends Vue {}
+export default class App extends Vue {
+  created() {
+    const setVuetifyTheme = (value: boolean) => {
+      this.$vuetify.theme.dark = value;
+    };
+    if (window.matchMedia("(prefers-color-scheme: dark)").matches)
+      setVuetifyTheme(true);
+    window
+      .matchMedia("(prefers-color-scheme: dark)")
+      .addEventListener("change", function(e) {
+        console.log(`changed to ${e.matches ? "dark" : "light"} mode`);
+        setVuetifyTheme(e.matches);
+      });
+  }
+}
 </script>

@@ -8,7 +8,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from radiologo.permissions import IsProgrammingR, IsDirector, IsRadiologoDeveloper, IsTechnicalLogisticR, \
-    IsCommunicationMarketingR, IsAdministration
+    IsCommunicationMarketingR, IsAdministration, IsProgramOwnerR
 from radiologo.permissions import IsProgrammingRW, IsProgramOwner, IsTechnicalLogisticRW
 from .. import tasks
 from ..models.program import Program
@@ -43,7 +43,8 @@ class GetUpdateDeleteProgramView(APIView):
     permission_classes = (
         IsAuthenticated, (
                 IsAdministration | IsDirector | IsRadiologoDeveloper |
-                IsProgrammingR | IsTechnicalLogisticR | IsCommunicationMarketingR
+                IsProgrammingR | IsTechnicalLogisticR | IsCommunicationMarketingR |
+                IsProgramOwnerR
         )
     )
 

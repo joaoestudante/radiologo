@@ -77,7 +77,7 @@ class RemoteService:
 
     def get_archive_contents(self, normalized_program_name):
         destination = "/srv/arquivo_sonoro/radiologo/"
-        file_list = {}
+        file_list = []
 
         self.open_ssh_archive()
         ftp_client = self.ssh_client.open_sftp()
@@ -86,11 +86,14 @@ class RemoteService:
             ftp_client.chdir(destination + normalized_program_name)
             for file_name in ftp_client.listdir():
                 compact_date = re.findall('\d{8,9}', file_name)[0]
-                display_date = datetime.strptime(compact_date[:8], "%Y%m%d").strftime("%d/%m/%Y")
-                file_list[display_date] = {
+                display_date = datetime.strptime(compact_date[:8], "%Y%m%d").strftime("%Y-%m-%d")
+                file_list.append({
                     "file_date": compact_date,
-                    "file_name": file_name}
-            file_list = sorted(file_list.items(), key=lambda k: k[1]['file_date'], reverse=True)
+                    "file_name": file_name,
+                    "display_date": display_date,
+                    "bytes":ftp_client.stat(file_name).st_size
+                })
+            file_list = sorted(file_list, key=lambda k: k['file_date'], reverse=True)
 
         except IOError as e:
             pass
@@ -198,9 +201,11 @@ class RemoteService:
                                         password=settings.ARCHIVE_SERVER_PASSWORD)
                 print("SSH connection to archive server established.")
                 return
-            except Exception:
+            except Exception as e:
                 print("Could not connect to archive server. Trying again. [Attempt {}/5]".format(tries))
                 tries += 1
+                print(tries)
+                print(e)
         raise CouldNotConnectToServerException
 
     def open_ssh_emission(self):

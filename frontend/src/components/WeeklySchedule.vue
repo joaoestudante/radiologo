@@ -23,12 +23,7 @@
           :activator="selectedElement"
           offset-x
         >
-          <v-card
-            color="grey lighten-4"
-            min-width="150px"
-            max-width="550px"
-            flat
-          >
+          <v-card min-width="150px" max-width="550px" flat>
             <v-toolbar :color="selectedEvent.color" dark>
               <v-toolbar-title v-html="selectedEvent.name"></v-toolbar-title>
               <v-spacer></v-spacer>
@@ -40,7 +35,7 @@
               <span v-html="selectedEvent.description"></span>
             </v-card-text>
             <v-card-actions>
-              <v-btn text color="secondary" @click="selectedOpen = false">
+              <v-btn text @click="selectedOpen = false">
                 Fechar
               </v-btn>
             </v-card-actions>
@@ -84,7 +79,7 @@ export default class WeeklySchedule extends Vue {
 
   showEvent({
     nativeEvent,
-    event,
+    event
   }: {
     nativeEvent: any;
     event: ScheduleProgram;

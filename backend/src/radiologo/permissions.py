@@ -1,3 +1,4 @@
+from django.contrib.auth import get_user_model
 from rest_framework.permissions import BasePermission
 
 from programs.models import Program
@@ -66,6 +67,21 @@ class IsProgramOwner(BasePermission):
     def has_permission(self, request, view):
         requested_program = Program.objects.get(pk=view.kwargs["pk"])
         if request.user in list(requested_program.authors.all()):
+            return True
+        return False
+
+
+class IsProgramOwnerR(BasePermission):
+    def has_permission(self, request, view):
+        requested_program = Program.objects.get(pk=view.kwargs["pk"])
+        if request.user in list(requested_program.authors.all()) and request.method in allowed_read_methods:
+            return True
+        return False
+
+
+class IsUserR(BasePermission):
+    def has_permission(self, request, view):
+        if request.user.pk == view.kwargs["pk"] and request.method in allowed_read_methods:
             return True
         return False
 
