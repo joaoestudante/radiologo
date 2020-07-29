@@ -81,6 +81,32 @@
               Playlist
             </v-btn>
           </template>
+          <v-list>
+            <v-list-item
+              :to="{
+                name: 'playlist-upload'
+              }"
+            >
+              <v-list-item-content>
+                <v-list-item-title>Upload</v-list-item-title>
+              </v-list-item-content>
+              <v-list-item-icon>
+                <v-icon>backup</v-icon>
+              </v-list-item-icon>
+            </v-list-item>
+            <v-list-item
+              :to="{
+                name: 'playlist-show'
+              }"
+            >
+              <v-list-item-content>
+                <v-list-item-title>Gerir</v-list-item-title>
+              </v-list-item-content>
+              <v-list-item-icon>
+                <v-icon>folder-music</v-icon>
+              </v-list-item-icon>
+            </v-list-item>
+          </v-list>
         </v-menu>
 
         <v-menu offset-y transition="slide-y-transition" open-on-hover>
