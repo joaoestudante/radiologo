@@ -50,3 +50,21 @@ class ProgramService:
                         {"name": slot.program.name, "description": slot.program.description, "start": start,
                          "end": end})
         return events
+    
+    def get_current_slot(self):
+        current_weekday = date.today().isoweekday()
+        current_time = datetime.now().time()
+        for slot in Slot.objects.all():
+            if slot.program.state == 'A' \
+            and slot.iso_weekday == current_weekday \
+            and slot.time.time() <= current_time \
+            and slot.end_time_obj().time() >= current_time:
+                start = slot.time.strftime("%H:%M")
+                end = slot.end_time()
+                if slot.is_rerun:
+                    return {"name": slot.program.name + " - RE", "description": slot.program.description, "start": start,
+                         "end": end, "type": "rerun"}
+                else:
+                    return {"name": slot.program.name, "description": slot.program.description, "start": start,
+                         "end": end, "type": "normal"}
+        return {}
