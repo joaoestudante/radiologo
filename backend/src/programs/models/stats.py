@@ -1,4 +1,4 @@
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 
 from django.db import models
 from django.utils.translation import gettext_lazy as _
@@ -7,20 +7,25 @@ from django.core.validators import validate_comma_separated_integer_list
 from .slot import Slot
 
 class Stats(models.Model):
-    date = models.DateField(verbose_name="Data", auto_now_add=True)
-    slot = models.ForeignKey(verbose_name="Slot correspondente às estatísticas", to=Slot, on_delete=models.CASCADE)
-    listener_stats_str = models.CharField(verbose_name="Contagens de ouvintes durante a slot", 
+    date = models.DateField(verbose_name="Data da coleção de contagens", auto_now_add=True)
+    time = models.TimeField(verbose_name="Hora de início da coleção de contagens", auto_now_add=True)
+    slot = models.ForeignKey(verbose_name="Slot correspondente às contagens, se existir", 
+    							null=True,
+    							blank=True,
+    							to=Slot, 
+    							on_delete=models.CASCADE)
+    listener_stats_str = models.CharField(verbose_name="Contagens de ouvintes (período 2 min)", 
     										max_length=360, 
     										default='',
     										validators=[validate_comma_separated_integer_list])
 
     @property
-    def start_time(self):
-    	return self.slot.time
+    def hour(self):
+    	return self.time.hour
     
     @property
     def end_time(self):
-    	return self.slot.end_time_obj
+    	return self.time + timedelta(minutes = 2*len(self.listener_stats_list)-2)
 
     @property 
     def listener_stats_list(self) -> list:
@@ -49,15 +54,5 @@ class Stats(models.Model):
     	stats_string = ",".join(stats_list)
     	self.listener_stats_str = stats_string
 
-    @staticmethod
-    def current_active_slot():
-        current_weekday = date.today().isoweekday()
-        current_time = datetime.now().time()
-        for slot in Slot.objects.all():
-            if slot.program.state == 'A' \
-            and slot.iso_weekday == current_weekday \
-            and slot.time <= current_time \
-            and slot.end_time_obj() >= current_time:
-            	return slot
-        return None
+
 
