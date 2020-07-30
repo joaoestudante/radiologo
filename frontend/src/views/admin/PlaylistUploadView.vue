@@ -4,7 +4,7 @@
       <v-row align="center" justify="center">
         <v-card class="mx-4" :max-width="maxWidthValue">
           <v-toolbar flat>
-            <v-toolbar-title v-html="program.name"></v-toolbar-title>
+            <v-toolbar-title>Upload para a Playlist</v-toolbar-title>
           </v-toolbar>
           <v-divider />
           <v-card-text align="center" justify="center" class="px-8">
