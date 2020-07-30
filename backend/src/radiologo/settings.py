@@ -204,5 +204,5 @@ PLAYLIST_SERVER_UPLOAD_DIRECTORY = config.get("Servers", "PlaylistServer.rootUpl
 
 #Stats
 ICECAST_AUTODJ_ENDPOINT = config.get("Stats", "IcecastEndpoint")
-ICECAST_ADMIN_PASSWORD = config.get("Servers", "IcecastAdminPassword")
+ICECAST_ADMIN_PASSWORD = config.get("Stats", "IcecastAdminPassword")
 
