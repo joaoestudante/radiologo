@@ -156,3 +156,9 @@ class Slot(models.Model):
         return (datetime(year=now.year, month=now.month, day=now.day, hour=self.time.hour,
                          minute=self.time.minute) + timedelta(
             minutes=self.program.max_duration)).strftime("%H:%M")
+    
+    def end_time_obj(self):
+        now = datetime.now()
+        return (datetime(year=now.year, month=now.month, day=now.day, hour=self.time.hour,
+                         minute=self.time.minute) + timedelta(
+            minutes=self.program.max_duration)).time()
