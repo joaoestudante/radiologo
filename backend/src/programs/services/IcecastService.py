@@ -29,14 +29,14 @@ class IcecastService:
         current_day = date.today()
         current_time = datetime.now().time()
         #Check if there is an active slot
-        slot = self.get_current_active_slot()
+        slot = IcecastService.get_current_active_slot()
         #If there are no active slots, report hourly stats
         if slot == None:
             #Get current hourly report
-            query =  Stats.objects.filter(day=current_day, slot=None).orderby('time')
+            query =  Stats.objects.filter(date=current_day, slot=None).order_by('time')
             current_stats_list = [obj for obj in query\
-                                 if obj.hour == current_time.hour()]
-            print(current_stats_list)
+                                 if obj.hour == current_time.hour]
+            #print(current_stats_list)
             if len(current_stats_list) > 0:
                 #If there is an hourly report, use the latest one available
                 current_stats = current_stats_list[-1]
@@ -47,17 +47,18 @@ class IcecastService:
         else:
             try:
                 #Get today's stats for this slot
-                current_stats = Stats.objects.get(day=current_day, slot=slot) 
+                current_stats = Stats.objects.get(date=current_day, slot=slot) 
             except:
                 #If it does not exist, create the stats for this slot
                 current_stats = Stats.objects.create(slot=slot)    
         return current_stats
 
     @staticmethod
-    def report_listener_count(current_stats):
-        listener_count = self.get_current_listeners()
-        current_stats = self.get_create_current_stats()
+    def report_listener_count():
+        listener_count = IcecastService.get_current_listeners()
+        current_stats = IcecastService.get_create_current_stats()
         current_stats.append(listener_count)
+        current_stats.save()
         return True
 
     @staticmethod

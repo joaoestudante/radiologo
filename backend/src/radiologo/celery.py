@@ -21,5 +21,9 @@ celery_app.conf.beat_schedule = {
     'rss-upload': {
         'task': 'programs.tasks.upload_from_feed',
         'schedule': crontab(minute='10', hour='07')
+    },
+    'update-stats': {
+        'task': 'programs.tasks.update_listener_stats',
+        'schedule': crontab(minute='*/2')
     }
 }

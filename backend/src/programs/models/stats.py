@@ -51,7 +51,7 @@ class Stats(models.Model):
     def append(self, listener_count):
         stats_list = self.listener_stats_list
         stats_list.append(int(listener_count))
-        stats_string = ",".join(stats_list)
+        stats_string = ",".join(map(str, stats_list))
         self.listener_stats_str = stats_string
 
 
