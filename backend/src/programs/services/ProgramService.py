@@ -57,8 +57,8 @@ class ProgramService:
         for slot in Slot.objects.all():
             if slot.program.state == 'A' \
             and slot.iso_weekday == current_weekday \
-            and slot.time.time() <= current_time \
-            and slot.end_time_obj().time() >= current_time:
+            and slot.time <= current_time \
+            and slot.end_time_obj() >= current_time:
                 start = slot.time.strftime("%H:%M")
                 end = slot.end_time()
                 if slot.is_rerun:
