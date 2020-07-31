@@ -13,7 +13,7 @@ class FileChecker:
     Returns a parameters string for export, or error if there are problems.
     """
 
-    def __init__(self, file_path, durations, min_sample_rate, min_bitrate, recommended_bitrate, info, do_normalization, check_duration):
+    def __init__(self, file_path, durations, min_sample_rate, min_bitrate, recommended_bitrate, info, do_normalization, do_check_duration):
         self.do_normalization = do_normalization
         self.info = info
         self.recommended_bitrate = recommended_bitrate
@@ -23,7 +23,7 @@ class FileChecker:
         self.file_path = file_path
         self.problems = []
         self.warnings = []
-        self.check_duration = check_duration
+        self.do_check_duration = do_check_duration
 
     def run_checks(self):
         default_params = ["-ar", self.min_sample_rate, "-ac", '2']  # 2 = number of channels
@@ -109,7 +109,7 @@ class FileChecker:
         return normalization_data
 
     def check_duration(self, measured_duration: float):
-        if self.check_duration == False:
+        if self.do_check_duration == False:
             return 1
         closest_duration = min(self.durations, key=lambda x: abs(x - measured_duration))
         seconds = measured_duration*60
