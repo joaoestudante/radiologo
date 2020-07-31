@@ -61,7 +61,7 @@ class ProcessingService:
                                   min_sample_rate=self.min_sample_rate, min_bitrate=self.min_bitrate,
                                   recommended_bitrate=self.recommended_bitrate, info=info,
                                   do_normalization=not self.already_normalized, 
-                                  check_duration=self.adjust_duration)
+                                  do_check_duration=self.adjust_duration)
             print("\t* Checking file...")
             parameters = checker.run_checks()
 
