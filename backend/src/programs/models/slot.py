@@ -156,3 +156,7 @@ class Slot(models.Model):
         return (datetime(year=now.year, month=now.month, day=now.day, hour=self.time.hour,
                          minute=self.time.minute) + timedelta(
             minutes=self.program.max_duration)).strftime("%H:%M")
+
+    @staticmethod
+    def allowed_slots():
+        return allowed_slots

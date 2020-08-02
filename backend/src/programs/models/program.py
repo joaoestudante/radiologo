@@ -24,7 +24,7 @@ class Program(models.Model):
     description = models.CharField(verbose_name="Descrição", max_length=500, default="")
     authors = models.ManyToManyField(get_user_model(), verbose_name="Autores", blank=True)
     max_duration = models.IntegerField(verbose_name="Duração Máxima", default=28, choices=DURATIONS)
-    first_emission_date = models.DateTimeField(verbose_name="Primeira emissão", default=timezone.now)
+    first_emission_date = models.DateField(verbose_name="Primeira emissão", default=timezone.now)
     comes_normalized = models.BooleanField(verbose_name="Não aplicar alteração dinâmica de volume", default=False,
                                            help_text="Caso o programa tenha certas partes propositadamente baixas, "
                                                      "selecciona esta opção.")

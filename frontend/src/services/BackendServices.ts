@@ -39,7 +39,7 @@ httpClient.interceptors.response.use(
   },
   error => {
     console.log(error);
-    if (error.response.status === 401) {
+    if (error.response && error.response.status === 401) {
       Store.commit("logout");
       Store.commit("stopLoading");
       router.push({ name: "login" });
@@ -145,6 +145,34 @@ export default class BackendServices {
       .get("/programs/" + programId + "/")
       .then(response => {
         return new Program(response.data);
+      });
+  }
+
+  static async getProgramNextUploadDate(programId: string): Promise<string> {
+    return httpClient
+      .get("/programs/" + programId + "/archive/next-upload/")
+      .then(response => {
+        return response.data;
+      });
+  }
+
+  static async getAllPrograms(): Promise<Program[]> {
+    return httpClient.get("/programs/").then(response => {
+      return response.data.map((programJson: any) => new Program(programJson));
+    });
+  }
+
+  static async getAllUsers(): Promise<User[]> {
+    return httpClient.get("/users/").then(response => {
+      return response.data.map((userJson: any) => new User(userJson));
+    });
+  }
+
+  static async getAllFreeSlots(programId: number): Promise<any> {
+    return httpClient
+      .get("/programs/" + programId + "/free-slots/")
+      .then(response => {
+        return response.data;
       });
   }
 }

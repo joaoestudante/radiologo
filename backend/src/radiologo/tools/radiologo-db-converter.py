@@ -80,9 +80,9 @@ class DBConverter:
         print(new_fields)
         for program in old_programs_list:
             new_program = (
-                program["id"], program["name"], program["description"], program["duracao_maxima"],
-                program["primeira_emissao"], program["vem_normalizado"], program["ignorarAjuste"],
-                program["externo"], program["estado"], False, ""
+                program["id"], program["name"], program["description"], program["duracao_maxima"], program["vem_normalizado"], program["ignorarAjuste"],
+                program["externo"], program["estado"], False, "",
+                program["primeira_emissao"].split(" ")[0]
             )
             new_cur.execute(query, new_program)
         new_db.commit()
@@ -119,7 +119,7 @@ class DBConverter:
                                                                    ",?" * (len(new_fields) - 1))
         print(new_fields)
         for slot in old_slots_list:
-            new_slot = (slot["id"], int(slot["day"])+1, slot["time"], slot["programa_associado_id"], False)
+            new_slot = (slot["id"], int(slot["day"])+1, slot["time"][:-3], slot["programa_associado_id"], False)
             new_cur.execute(query, new_slot)
         new_db.commit()
 

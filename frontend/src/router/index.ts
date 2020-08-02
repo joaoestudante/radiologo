@@ -6,6 +6,8 @@ import Login from "@/views/LoginView.vue";
 import UploadView from "@/views/member/UploadView.vue";
 import ArchiveView from "@/views/member/ArchiveView.vue";
 import Store from "@/store";
+import ProgramsView from "@/views/admin/ProgramsView.vue";
+import CardedProgramsView from "@/views/admin/CardedProgramsView.vue";
 
 Vue.use(VueRouter);
 
@@ -33,6 +35,12 @@ const routes: Array<RouteConfig> = [
     name: "programs-archive",
     component: ArchiveView,
     meta: { title: "Radiólogo - Arquivo", requiredAuth: "None" }
+  },
+  {
+    path: "/administration/programs/",
+    name: "all-programs",
+    component: ProgramsView,
+    meta: { title: "Radiólogo - Programas", requiredAuth: "ListAllPrograms" }
   },
   {
     path: "**",

@@ -2,7 +2,7 @@
   <v-row>
     <v-col>
       <v-row align="center" justify="center">
-        <v-card class="mx-4" :max-width="maxWidthValue">
+        <v-card class="mx-4" :max-width="maxWidthValue" v-if="program != null">
           <v-toolbar flat>
             <v-toolbar-title v-html="program.name"></v-toolbar-title>
           </v-toolbar>
@@ -114,7 +114,7 @@ import moment from "moment";
 
 @Component
 export default class UploadView extends Vue {
-  program: Program | undefined;
+  program: Program | null = null;
   date: string | undefined = "";
   loading = false;
   alreadyUploadedDates: string[] = [];
@@ -126,17 +126,26 @@ export default class UploadView extends Vue {
   isSelecting = false;
   defaultButtonText = "Escolher ficheiro";
 
-  beforeCreate() {
+  created() {
     const id = this.$route.params.id;
     BackendServices.updateUserData();
     for (const program of this.$store.getters.getUser.programSet)
-      if (program.id == id) {
+      if (program.id == id) this.program = program;
+
+    if (this.program == null) {
+      BackendServices.getProgram(id).then(program => {
         this.program = program;
-        BackendServices.getUploadedDates(id).then(dates => {
-          this.alreadyUploadedDates = dates;
-          this.date = program.nextUploadDate;
-        });
-      }
+        console.log(this.program.enabledDays);
+      });
+    }
+
+    BackendServices.getUploadedDates(id).then(dates => {
+      this.alreadyUploadedDates = dates;
+    });
+
+    BackendServices.getProgramNextUploadDate(id).then(date => {
+      this.date = date;
+    });
   }
 
   allowedDates(val: string) {

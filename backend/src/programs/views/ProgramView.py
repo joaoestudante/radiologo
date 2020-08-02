@@ -28,7 +28,7 @@ class ListCreateProgramsView(APIView):
     )
 
     def get(self, request):
-        programs = [program for program in Program.objects.all()]
+        programs = [program for program in Program.objects.all().order_by('name')]
         serialized = ProgramSerializer(programs, many=True)
         return Response(serialized.data, status=status.HTTP_200_OK)
 
@@ -192,3 +192,18 @@ class GetWeeklySchedule(APIView):
     def get(self, request):
         schedule = ProgramService().get_schedule()
         return Response(status=status.HTTP_200_OK, data=schedule)
+
+
+class GetArchiveNextUpload(APIView):
+    permission_classes = GetProgramAlreadyUploadedDates.permission_classes
+
+    def get(self, request, pk):
+        program = get_object_or_404(Program, pk=pk)
+        return Response(status=status.HTTP_200_OK, data=program.next_upload_date())
+
+
+class GetWeeklyFreeSlots(APIView):
+    permission_classes = GetUpdateDeleteProgramView.permission_classes
+
+    def get(self, request, pk):
+        return Response(status=status.HTTP_200_OK, data=ProgramService.get_week_slots_display(pk))
