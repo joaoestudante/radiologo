@@ -15,6 +15,7 @@ from ..models.program import Program
 from ..serializers.ProgramSerializer import ProgramSerializer
 from ..services.ProgramService import ProgramService
 from ..services.RemoteService import RemoteService
+from ..services.SlotService import SlotService
 from ..services.processing.ProcessingService import ProcessingService
 from ..services.rss_upload.FeedService import FeedService
 
@@ -202,8 +203,13 @@ class GetArchiveNextUpload(APIView):
         return Response(status=status.HTTP_200_OK, data=program.next_upload_date())
 
 
-class GetWeeklyFreeSlots(APIView):
+class GetFreeSlots(APIView):
     permission_classes = GetUpdateDeleteProgramView.permission_classes
 
-    def get(self, request, pk):
-        return Response(status=status.HTTP_200_OK, data=ProgramService.get_week_slots_display(pk))
+    def get(self, request):
+        weekdays = request.GET.get('weekdays').split(',')
+        if weekdays[0] != '':
+            weekdays = [int(x) for x in weekdays]
+        duration = int(request.GET.get('duration'))
+        pk = int(request.GET.get('id'))
+        return Response(status=status.HTTP_200_OK, data=SlotService().free_slots(duration, weekdays, pk))

@@ -1,4 +1,5 @@
 from datetime import datetime, date, timedelta
+from typing import List
 
 from exceptions.radiologoexception import InvalidDateFormatForEmissionException, InvalidDateForEmissionException
 from ..models import Program, Slot
@@ -53,16 +54,3 @@ class ProgramService:
                          "end": end})
         return events
 
-    @staticmethod
-    def get_week_slots_display(pk: int):
-        disabled = {}
-        possible_slots = Slot.allowed_slots()
-        for i in range(1,8):
-            disabled[i] = list(possible_slots)
-
-        for program in Program.objects.filter(state__in=['A','H']).exclude(pk=pk):
-            for day, slots in program.occupied_slots.items():
-                for slot in slots:
-                    disabled[day].remove(slot)
-
-        return disabled

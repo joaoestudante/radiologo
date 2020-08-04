@@ -6,6 +6,7 @@ import router from "@/router";
 import User from "@/models/user/User";
 import FileSaver from "file-saver";
 import Program from "@/models/program/program";
+import program from "@/models/program/program";
 
 const httpClient = axios.create();
 httpClient.defaults.timeout = 100000;
@@ -168,9 +169,21 @@ export default class BackendServices {
     });
   }
 
-  static async getAllFreeSlots(programId: number): Promise<any> {
+  static async getAllFreeSlots(
+    programId: number,
+    weekdays: Array<number>,
+    duration: number
+  ): Promise<any> {
     return httpClient
-      .get("/programs/" + programId + "/free-slots/")
+      .get(
+        "/programs/free-slots/" +
+          "?weekdays=" +
+          weekdays.join(",") +
+          "&duration=" +
+          duration +
+          "&id=" +
+          programId
+      )
       .then(response => {
         return response.data;
       });

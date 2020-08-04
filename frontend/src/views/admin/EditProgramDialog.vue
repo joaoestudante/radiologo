@@ -118,6 +118,8 @@
                 :items="durationItems"
                 outlined
                 label="Duração"
+                @change="updatePossibleSlots"
+                :disabled="editedProgram.state !== 'A'"
               ></v-select>
             </v-row>
             <v-row>
@@ -127,6 +129,8 @@
                 multiple
                 outlined
                 label="Dias de emissão"
+                @change="updatePossibleSlots"
+                :disabled="editedProgram.state !== 'A'"
               ></v-select>
             </v-row>
             <v-row>
@@ -135,6 +139,7 @@
                 :items="possibleSlots"
                 outlined
                 label="Hora de emissão"
+                :disabled="editedProgram.state !== 'A'"
               ></v-select>
             </v-row>
           </v-col>
@@ -167,31 +172,32 @@ export default class EditProgramDialog extends Vue {
   stateItems = Program.stateItems();
   durationItems = Program.durationItems();
   weekItems = Program.weekItems();
-  freeSlots = [];
   possibleSlots: { text: string; disabled: boolean }[] = [];
   newSlotTime: { text: string; disabled: boolean } = {
     text: "",
     disabled: true
   };
 
-  mounted() {
+  created() {
     this.updateProgram();
     console.log("updated program");
     BackendServices.getAllUsers().then(usersList => {
       this.allUsers = usersList;
     });
-    BackendServices.getAllFreeSlots(this.editedProgram.id).then(slots => {
-      this.freeSlots = slots;
-      for (const weekday of this.editedProgram.enabledDays) {
-        for (const slot of Slot.getAllPossibleSlots()) {
-          const weekdaySlots: string[] = this.freeSlots[weekday];
-          if (!weekdaySlots.includes(slot)) {
-            this.possibleSlots.push({ text: slot, disabled: true });
-            console.log("Weekday " + weekday + " does not include " + slot);
-          } else {
-            this.possibleSlots.push({ text: slot, disabled: false });
-          }
-        }
+    this.updatePossibleSlots();
+  }
+
+  updatePossibleSlots() {
+    BackendServices.getAllFreeSlots(
+      this.editedProgram.id,
+      this.editedProgram.enabledDays,
+      this.editedProgram.maxDuration
+    ).then(slots => {
+      this.possibleSlots = [];
+      for (const slot of Slot.getAllPossibleSlots()) {
+        if (slots.includes(slot))
+          this.possibleSlots.push({ text: slot, disabled: false });
+        else this.possibleSlots.push({ text: slot, disabled: true });
       }
     });
   }
