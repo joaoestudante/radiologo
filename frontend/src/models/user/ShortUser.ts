@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/camelcase */
 export default class ShortUser {
   id!: number;
   authorName!: string;
@@ -7,5 +8,9 @@ export default class ShortUser {
       this.id = jsonObj.id;
       this.authorName = jsonObj.author_name;
     }
+  }
+
+  toJson() {
+    return { id: this.id, author_name: this.authorName };
   }
 }

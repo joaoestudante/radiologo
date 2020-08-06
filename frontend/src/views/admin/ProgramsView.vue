@@ -13,6 +13,7 @@
           label="Pesquisar"
           single-line
           hide-details
+          clearable
         ></v-text-field>
         <v-data-table
           :headers="headers"
@@ -72,6 +73,7 @@
         v-model="programDialog"
         :program="selectedProgram"
         v-on:close-dialog="programDialog = false"
+        v-on:program-saved="getAllPrograms"
       ></EditProgramDialog>
     </v-card>
   </v-row>
@@ -97,6 +99,10 @@ export default class ProgramsView extends Vue {
   selectedProgram: Program | null = null;
 
   created() {
+    this.getAllPrograms();
+  }
+
+  getAllPrograms() {
     BackendServices.getAllPrograms().then(programsList => {
       this.items = programsList;
     });

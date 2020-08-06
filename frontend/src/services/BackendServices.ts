@@ -188,4 +188,12 @@ export default class BackendServices {
         return response.data;
       });
   }
+
+  static async updateProgram(program: Program): Promise<Program> {
+    return httpClient
+      .patch("/programs/" + program.id + "/", program.toJson())
+      .then(response => {
+        return new Program(response.data);
+      });
+  }
 }

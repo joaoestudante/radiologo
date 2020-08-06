@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/camelcase */
 import ShortUser from "@/models/user/ShortUser";
 import Slot from "@/models/program/slot";
 
@@ -28,7 +29,9 @@ export default class Program {
       this.ignoreDurationAdjustment = jsonObj.ignore_duration_adjustment;
       this.isExternal = jsonObj.is_external;
       this.state = jsonObj.state;
-      this.slotSet = jsonObj.slot_set;
+      this.slotSet = jsonObj.slot_set.map((slotJson: Slot) => {
+        return new Slot(slotJson);
+      });
       this.authors = jsonObj.authors.map((authorJson: any) => {
         return new ShortUser(authorJson);
       });
@@ -76,5 +79,27 @@ export default class Program {
       { text: "Sábado", value: 6 },
       { text: "Domingo", value: 7 }
     ];
+  }
+
+  toJson() {
+    return {
+      id: this.id,
+      name: this.name,
+      normalized_name: this.normalizedName,
+      description: this.description,
+      max_duration: this.maxDuration,
+      first_emission_date: this.firstEmissionDate,
+      comes_normalized: this.comesNormalized,
+      ignore_duration_adjustment: this.ignoreDurationAdjustment,
+      is_external: this.isExternal,
+      state: this.state,
+      slot_set: this.slotSet.map(slot => {
+        console.log(slot);
+        return slot.toJson();
+      }),
+      authors: this.authors.map(author => {
+        return author.toJson();
+      })
+    };
   }
 }

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/camelcase */
 export default class Slot {
   isoWeekday!: string;
   time!: string;
@@ -62,5 +63,13 @@ export default class Slot {
       "23:03",
       "23:32"
     ];
+  }
+
+  toJson() {
+    return {
+      iso_weekday: this.isoWeekday,
+      time: this.time,
+      is_rerun: this.isRerun
+    };
   }
 }

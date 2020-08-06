@@ -41,6 +41,7 @@
                 chips
                 deletable-chips
                 item-text="authorName"
+                :item-value="buildAuthor"
                 label="Autores"
                 hint="Caso o programa não seja da autoria de um membro da Rádio Zero, escolhe o autor 'Externo'."
                 persistent-hint
@@ -155,11 +156,13 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue, Model, Watch } from "vue-property-decorator";
+/* eslint-disable @typescript-eslint/camelcase */
+import { Component, Model, Prop, Vue, Watch } from "vue-property-decorator";
 import Program from "@/models/program/program";
 import User from "@/models/user/User";
 import BackendServices from "@/services/BackendServices";
 import Slot from "@/models/program/slot";
+import ShortUser from "@/models/user/ShortUser";
 
 @Component
 export default class EditProgramDialog extends Vue {
@@ -218,9 +221,28 @@ export default class EditProgramDialog extends Vue {
     }
   }
 
+  buildAuthor(value: User) {
+    return new ShortUser({ id: value.id, author_name: value.authorName });
+  }
+
   saveProgram() {
-    console.log(this.editedProgram?.name);
-    this.closeDialog();
+    console.log(this.newSlotTime);
+    this.editedProgram.slotSet = this.editedProgram.enabledDays.map(day => {
+      return new Slot({
+        iso_weekday: day,
+        time: this.newSlotTime,
+        is_rerun: false
+      }); //TODO change here when implementing rerun
+    });
+    BackendServices.updateProgram(this.editedProgram)
+      .then(() => {
+        this.$emit("program-saved", true);
+        this.closeDialog();
+      })
+      .catch(error => {
+        console.log("ERROR occured");
+        console.log(error);
+      });
   }
 
   closeDialog() {
