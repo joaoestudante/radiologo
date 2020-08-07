@@ -196,4 +196,16 @@ export default class BackendServices {
         return new Program(response.data);
       });
   }
+
+  static async createProgram(program: Program): Promise<Program> {
+    return httpClient.post("/programs/", program.toJson()).then(response => {
+      return new Program(response.data);
+    });
+  }
+
+  static async deleteProgram(programId: number): Promise<any> {
+    return httpClient.delete("/programs/" + programId + "/").then(response => {
+      return response;
+    });
+  }
 }

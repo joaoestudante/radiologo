@@ -41,12 +41,12 @@ export default class Program {
       this.name = "";
       this.normalizedName = "";
       this.description = "";
-      this.maxDuration = 0;
-      this.firstEmissionDate = "";
+      this.maxDuration = 28;
+      this.firstEmissionDate = new Date().toISOString().substr(0, 10);
       this.comesNormalized = false;
       this.ignoreDurationAdjustment = false;
       this.isExternal = false;
-      this.state = "";
+      this.state = "A";
       this.slotSet = [];
       this.authors = [];
       this.enabledDays = [];
