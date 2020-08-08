@@ -5,7 +5,7 @@ from ..models.slot import Slot
 
 class SlotSerializer(serializers.Serializer):
     iso_weekday = serializers.CharField(max_length=15)
-    time = serializers.TimeField()
+    time = serializers.TimeField(format="%H:%M")
     is_rerun = serializers.BooleanField()
 
     class Meta:

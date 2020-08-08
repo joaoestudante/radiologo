@@ -69,7 +69,7 @@
         <v-divider vertical inset></v-divider>
         <v-menu offset-y transition="slide-y-transition" open-on-hover>
           <template v-slot:activator="{ on }">
-            <v-btn text v-on="on">
+            <v-btn text v-on="on" to="/administration/programs/">
               Programas
             </v-btn>
           </template>

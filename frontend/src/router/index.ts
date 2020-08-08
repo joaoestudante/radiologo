@@ -7,6 +7,8 @@ import UploadView from "@/views/member/UploadView.vue";
 import ArchiveView from "@/views/member/ArchiveView.vue";
 import PlaylistUploadView from "@/views/admin/PlaylistUploadView.vue";
 import Store from "@/store";
+import ProgramsView from "@/views/admin/ProgramsView.vue";
+import CardedProgramsView from "@/views/admin/CardedProgramsView.vue";
 
 Vue.use(VueRouter);
 
@@ -40,6 +42,12 @@ const routes: Array<RouteConfig> = [
     name: "playlist-upload",
     component: PlaylistUploadView,
     meta: { title: "Radiólogo - Upload Playlist", requiredAuth: "UserUpload" }
+  },
+  {
+    path: "/administration/programs/",
+    name: "all-programs",
+    component: ProgramsView,
+    meta: { title: "Radiólogo - Programas", requiredAuth: "ListAllPrograms" }
   },
   {
     path: "**",

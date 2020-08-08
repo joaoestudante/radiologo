@@ -6,6 +6,7 @@ import router from "@/router";
 import User from "@/models/user/User";
 import FileSaver from "file-saver";
 import Program from "@/models/program/program";
+import program from "@/models/program/program";
 
 const httpClient = axios.create();
 httpClient.defaults.timeout = 100000;
@@ -39,7 +40,7 @@ httpClient.interceptors.response.use(
   },
   error => {
     console.log(error);
-    if (error.response.status === 401) {
+    if (error.response && error.response.status === 401) {
       Store.commit("logout");
       Store.commit("stopLoading");
       router.push({ name: "login" });
@@ -166,5 +167,65 @@ export default class BackendServices {
       .then(response => {
         return new Program(response.data);
       });
+  }
+
+  static async getProgramNextUploadDate(programId: string): Promise<string> {
+    return httpClient
+      .get("/programs/" + programId + "/archive/next-upload/")
+      .then(response => {
+        return response.data;
+      });
+  }
+
+  static async getAllPrograms(): Promise<Program[]> {
+    return httpClient.get("/programs/").then(response => {
+      return response.data.map((programJson: any) => new Program(programJson));
+    });
+  }
+
+  static async getAllUsers(): Promise<User[]> {
+    return httpClient.get("/users/").then(response => {
+      return response.data.map((userJson: any) => new User(userJson));
+    });
+  }
+
+  static async getAllFreeSlots(
+    programId: number,
+    weekdays: Array<number>,
+    duration: number
+  ): Promise<any> {
+    return httpClient
+      .get(
+        "/programs/free-slots/" +
+          "?weekdays=" +
+          weekdays.join(",") +
+          "&duration=" +
+          duration +
+          "&id=" +
+          programId
+      )
+      .then(response => {
+        return response.data;
+      });
+  }
+
+  static async updateProgram(program: Program): Promise<Program> {
+    return httpClient
+      .patch("/programs/" + program.id + "/", program.toJson())
+      .then(response => {
+        return new Program(response.data);
+      });
+  }
+
+  static async createProgram(program: Program): Promise<Program> {
+    return httpClient.post("/programs/", program.toJson()).then(response => {
+      return new Program(response.data);
+    });
+  }
+
+  static async deleteProgram(programId: number): Promise<any> {
+    return httpClient.delete("/programs/" + programId + "/").then(response => {
+      return response;
+    });
   }
 }
