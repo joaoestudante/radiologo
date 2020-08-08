@@ -69,14 +69,6 @@
         <v-divider vertical inset></v-divider>
         <v-menu offset-y transition="slide-y-transition" open-on-hover>
           <template v-slot:activator="{ on }">
-            <v-btn text v-on="on" to="/administration/programs/">
-              Programas
-            </v-btn>
-          </template>
-        </v-menu>
-
-        <v-menu offset-y transition="slide-y-transition" open-on-hover>
-          <template v-slot:activator="{ on }">
             <v-btn text v-on="on">
               Playlist
             </v-btn>
@@ -111,6 +103,14 @@
 
         <v-menu offset-y transition="slide-y-transition" open-on-hover>
           <template v-slot:activator="{ on }">
+            <v-btn text v-on="on" to="/administration/programs/">
+              Programas
+            </v-btn>
+          </template>
+        </v-menu>
+
+        <v-menu offset-y transition="slide-y-transition" open-on-hover>
+          <template v-slot:activator="{ on }">
             <v-btn text v-on="on">
               Membros
             </v-btn>
@@ -137,6 +137,7 @@
         </v-btn>
       </div>
     </v-app-bar>
+
     <v-navigation-drawer v-model="drawer" app absolute temporary>
       <v-list-item>
         <v-list-item-content>
@@ -152,7 +153,7 @@
 
         <v-list-group v-if="$store.getters.getUser.programSet.length > 0">
           <template v-slot:activator>
-            <v-list-item-title>Gerir programas</v-list-item-title>
+            <v-list-item-title>Meus programas</v-list-item-title>
           </template>
           <div
             v-for="(program, index) in $store.getters.getUser.programSet"
@@ -190,15 +191,31 @@
           </div>
         </v-list-group>
 
+        <v-list-group>
+          <template v-slot:activator>
+            <v-list-item-title>Playlist</v-list-item-title>
+          </template>
+          <v-list-item to="/playlist/upload/" class="ml-4">
+            <v-list-item-content>
+              Upload
+            </v-list-item-content>
+            <v-list-item-icon>
+              <v-icon>backup</v-icon>
+            </v-list-item-icon>
+          </v-list-item>
+          <v-list-item to="/playlist/show/" class="ml-4">
+            <v-list-item-content>
+              Gerir
+            </v-list-item-content>
+            <v-list-item-icon>
+              <v-icon>mdi-folder-music</v-icon>
+            </v-list-item-icon>
+          </v-list-item>
+        </v-list-group>
+
         <v-list-item to="/administration/programs/">
           <v-list-item-content>
             Programas
-          </v-list-item-content>
-        </v-list-item>
-
-        <v-list-item to="/administration/playlist/">
-          <v-list-item-content>
-            Playlist
           </v-list-item-content>
         </v-list-item>
 
