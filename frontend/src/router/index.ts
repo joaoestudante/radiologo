@@ -5,6 +5,7 @@ import NotFoundView from "@/views/NotFoundView.vue";
 import Login from "@/views/LoginView.vue";
 import UploadView from "@/views/member/UploadView.vue";
 import ArchiveView from "@/views/member/ArchiveView.vue";
+import PlaylistUploadView from "@/views/admin/PlaylistUploadView.vue";
 import Store from "@/store";
 import ProgramsView from "@/views/admin/ProgramsView.vue";
 import CardedProgramsView from "@/views/admin/CardedProgramsView.vue";
@@ -35,6 +36,12 @@ const routes: Array<RouteConfig> = [
     name: "programs-archive",
     component: ArchiveView,
     meta: { title: "Radiólogo - Arquivo", requiredAuth: "None" }
+  },
+  {
+    path: "/playlist/upload",
+    name: "playlist-upload",
+    component: PlaylistUploadView,
+    meta: { title: "Radiólogo - Upload Playlist", requiredAuth: "UserUpload" }
   },
   {
     path: "/administration/programs/",
