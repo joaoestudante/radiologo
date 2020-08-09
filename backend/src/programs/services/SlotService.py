@@ -63,3 +63,22 @@ class SlotService:
         for i in range(1, 8):
             result[i] = self.occupied_slots_in_day(i)
         return result
+
+    def free_slots(self, duration, weekdays, pk):
+        result = list(Slot.allowed_slots())
+        occupied = []
+
+        for program in Program.objects.filter(state__in=['A','H']).exclude(pk=pk):
+            for slot in program.slot_set.all():
+                if slot.iso_weekday in weekdays:
+                    for slot_time in program.occupied_slots[slot.iso_weekday]:
+                        if slot_time in result:
+                            result.remove(slot_time)
+                            occupied.append(slot_time)
+
+        for slot_time in result:
+            for potentially_occupied_slot_time in Slot.slots_occupied(duration, datetime.strptime(slot_time, "%H:%M")):
+                if potentially_occupied_slot_time in occupied:
+                    result.remove(slot_time)
+
+        return result

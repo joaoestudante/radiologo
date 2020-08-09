@@ -1,4 +1,5 @@
 from datetime import datetime, date, timedelta
+from typing import List
 
 from exceptions.radiologoexception import InvalidDateFormatForEmissionException, InvalidDateForEmissionException
 from ..models import Program, Slot
@@ -18,10 +19,12 @@ class ProgramService:
         try:
             emission_date_obj = datetime.strptime(date, "%Y%m%d")
         except ValueError:
+            print("date is: " + date)
             raise InvalidDateFormatForEmissionException
         if slot_set.all().count() > 1:
             isoweekday = emission_date_obj.isoweekday()
             if isoweekday not in enabled_days:
+                print("date is: " + date)
                 raise InvalidDateForEmissionException
 
             weekday = slot_set.filter(weekday=Slot.iso_to_custom_format(isoweekday))[
@@ -68,3 +71,4 @@ class ProgramService:
                     return {"name": slot.program.name, "description": slot.program.description, "start": start,
                          "end": end, "type": "normal"}
         return {}
+

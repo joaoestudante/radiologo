@@ -15,6 +15,7 @@ from ..models.program import Program
 from ..serializers.ProgramSerializer import ProgramSerializer
 from ..services.ProgramService import ProgramService
 from ..services.RemoteService import RemoteService
+from ..services.SlotService import SlotService
 from ..services.processing.ProcessingService import ProcessingService
 from ..services.rss_upload.FeedService import FeedService
 
@@ -28,7 +29,7 @@ class ListCreateProgramsView(APIView):
     )
 
     def get(self, request):
-        programs = [program for program in Program.objects.all()]
+        programs = [program for program in Program.objects.all().order_by('name')]
         serialized = ProgramSerializer(programs, many=True)
         return Response(serialized.data, status=status.HTTP_200_OK)
 
@@ -192,3 +193,23 @@ class GetWeeklySchedule(APIView):
     def get(self, request):
         schedule = ProgramService().get_schedule()
         return Response(status=status.HTTP_200_OK, data=schedule)
+
+
+class GetArchiveNextUpload(APIView):
+    permission_classes = GetProgramAlreadyUploadedDates.permission_classes
+
+    def get(self, request, pk):
+        program = get_object_or_404(Program, pk=pk)
+        return Response(status=status.HTTP_200_OK, data=program.next_upload_date())
+
+
+class GetFreeSlots(APIView):
+    permission_classes = GetUpdateDeleteProgramView.permission_classes
+
+    def get(self, request):
+        weekdays = request.GET.get('weekdays').split(',')
+        if weekdays[0] != '':
+            weekdays = [int(x) for x in weekdays]
+        duration = int(request.GET.get('duration'))
+        pk = int(request.GET.get('id'))
+        return Response(status=status.HTTP_200_OK, data=SlotService().free_slots(duration, weekdays, pk))

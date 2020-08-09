@@ -22,8 +22,9 @@ class ProgramSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Program
-        fields = ['id', 'name', 'normalized_name', 'description', 'max_duration', 'first_emission_date', 'comes_normalized',
-                  'ignore_duration_adjustment', 'is_external', 'state', 'slot_set', 'enabled_days', 'next_upload_date',
+        fields = ['id', 'name', 'normalized_name', 'description', 'max_duration', 'first_emission_date',
+                  'comes_normalized',
+                  'ignore_duration_adjustment', 'is_external', 'state', 'slot_set', 'enabled_days',
                   'authors']
 
     @transaction.atomic

@@ -20,6 +20,7 @@
                 name="artist"
                 prepend-icon="mdi-account-music"
                 type="text"
+                style="width:1000pt"
               ></v-text-field>
               <v-row class="mt-5" align="start">
                 <p class="text-body-1 ml-4">
@@ -32,6 +33,7 @@
                 name="title"
                 prepend-icon="mdi-playlist-music"
                 type="text"
+                style="width:1000pt"
               ></v-text-field>
               <v-row class="mt-5" align="start">
                 <p class="text-body-1 ml-4">Ficheiro de emissão:</p>
