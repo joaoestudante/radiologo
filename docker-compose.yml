@@ -16,7 +16,7 @@ services:
     volumes:
       - ./backend:/var/www/radiologo
     ports:
-      - "8008:8000"
+      - "8000:8000"
     links:
       - redis
     depends_on:
@@ -64,5 +64,5 @@ services:
     links:
       - backend
     ports:
-      - "8080:80"
+      - "80:80"
     restart: unless-stopped
