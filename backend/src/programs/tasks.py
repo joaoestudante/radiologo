@@ -4,7 +4,7 @@ from celery import shared_task
 
 from programs.models import Program
 from programs.services.RemoteService import RemoteService
-
+from programs.services.IcecastService import IcecastService
 
 @shared_task
 def process_audio(uploaded_file_path, program_pk, uploader, email, emission_date):
@@ -36,3 +36,8 @@ def do_alignment():
         if tomorrow.isoweekday() in program.enabled_days:
             remote_service.move_from_archive_to_emission(program, tomorrow)
     return True
+
+@shared_task
+def update_listener_stats():
+    return IcecastService.report_listener_count()
+

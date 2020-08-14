@@ -201,3 +201,8 @@ PLAYLIST_SERVER_IP = config.get("Servers", "PlaylistServer.ip")
 PLAYLIST_SERVER_USERNAME = config.get("Servers", "PlaylistServer.username")
 PLAYLIST_SERVER_PASSWORD = config.get("Servers", "PlaylistServer.password")
 PLAYLIST_SERVER_UPLOAD_DIRECTORY = config.get("Servers", "PlaylistServer.rootUploadDirectory")
+
+#Stats
+ICECAST_AUTODJ_ENDPOINT = config.get("Stats", "IcecastEndpoint")
+ICECAST_ADMIN_PASSWORD = config.get("Stats", "IcecastAdminPassword")
+
