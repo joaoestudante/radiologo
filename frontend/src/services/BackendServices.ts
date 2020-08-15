@@ -111,26 +111,6 @@ export default class BackendServices {
       });
   }
 
-  static async uploadPlaylist(
-    artist: string,
-    title: string,
-    file: File,
-    progressUpdater: Function
-  ): Promise<any> {
-    const formData = new FormData();
-    formData.append("file", file);
-    formData.append("artist", artist);
-    formData.append("title", title);
-    return httpClient
-      .put("/playlist/upload/", formData, {
-        timeout: 60 * 10 * 1000,
-        onUploadProgress: progressEvent => progressUpdater(progressEvent)
-      })
-      .then(() => {
-        return Promise.resolve();
-      });
-  }
-
   static async getArchiveContents(programId: number): Promise<any> {
     return httpClient
       .get("/programs/" + programId + "/archive/")
@@ -159,6 +139,54 @@ export default class BackendServices {
         doLoading = true;
         Promise.resolve();
       });
+  }
+  
+  static async uploadPlaylist(
+    artist: string,
+    title: string,
+    file: File,
+    progressUpdater: Function
+  ): Promise<any> {
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("artist", artist);
+    formData.append("title", title);
+    return httpClient
+      .put("/playlist/upload/", formData, {
+        timeout: 60 * 10 * 1000,
+        onUploadProgress: progressEvent => progressUpdater(progressEvent)
+      })
+      .then(() => {
+        return Promise.resolve();
+      });
+  }
+  
+  static async downloadPlaylistTrack(
+    url: string,
+    outputFilename: string,
+    filesize: number,
+    downloadUpdater: Function
+  ): Promise<any> {
+    doLoading = false;
+    httpClient
+      .get(url, {
+        timeout: 30000,
+        onDownloadProgress: progressEvent =>
+          downloadUpdater((progressEvent.loaded * 100) / filesize),
+        responseType: "blob"
+      })
+      .then(response => {
+        console.log(response);
+        FileSaver.saveAs(response.data, outputFilename);
+        doLoading = true;
+        Promise.resolve();
+      });
+  }
+
+  static async deletePlaylistTrack(file_name: string): Promise<any> {
+    return httpClient.delete("/playlist/track/" + file_name + "/").then(response => {
+      return response;
+    });
   }
 
   static async getProgram(programId: string): Promise<Program> {

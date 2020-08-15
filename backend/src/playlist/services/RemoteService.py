@@ -36,7 +36,17 @@ class RemoteService:
         return
 
     def download_playlist_file(self, filename: str):
-        # Not implemented, previous implementation does not use SFTP
+        final_path = settings.PLAYLIST_SERVER_UPLOAD_DIRECTORY + filename
+        
+        self.open_ssh_playlist()
+        ftp_client = self.ssh_client.open_sftp()
+        
+        try:
+            size = ftp_client.stat(final_path).st_size
+            fileobj = ftp_client.file(final_path)
+            return (size, fileobj)
+        except IOError:
+            raise FileDoesNotExistException
         return False
 
     def get_playlist_contents(self):
@@ -49,8 +59,14 @@ class RemoteService:
         try:
             for entry in ftp_client.listdir_attr(destination):
                 mode = entry.st_mode
+                size = entry.st_size
+                name = entry.filename
                 if S_ISREG(mode):
-                    file_list.append(entry.filename)
+                    file_list.append({
+                        "file_name": entry.name,
+                        "bytes": size
+                    })
+                        
         except IOError as e:
             pass
         finally:
@@ -58,18 +74,18 @@ class RemoteService:
             return {i: file_list[i] for i in range(0, len(file_list))}
 
     def delete_playlist_file(self, filename: str):
-        file = settings.PLAYLIST_SERVER_UPLOAD_DIRECTORY + filename
+        final_path = settings.PLAYLIST_SERVER_UPLOAD_DIRECTORY + filename
 
         self.open_ssh_playlist()
         ftp_client = self.ssh_client.open_sftp()
 
         try:
-            ftp_client.remove(file)
+            ftp_client.remove(final_path)
         except IOError:
             raise FileDoesNotExistException
 
         try:
-            ftp_client.stat(file)
+            ftp_client.stat(final_path)
             raise FileNotDeletedException
         except IOError:
             pass  # Success
