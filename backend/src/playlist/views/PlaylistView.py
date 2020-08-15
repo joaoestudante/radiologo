@@ -3,6 +3,7 @@ from django.conf import settings
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from django.http import FileResponse
 
 from radiologo.permissions import IsAdministration, IsRadiologoDeveloper, IsDirector, IsProgrammingRW
 from .. import tasks

@@ -63,7 +63,7 @@ class RemoteService:
                 name = entry.filename
                 if S_ISREG(mode):
                     file_list.append({
-                        "file_name": entry.name,
+                        "file_name": name,
                         "bytes": size
                     })
                         
@@ -71,7 +71,7 @@ class RemoteService:
             pass
         finally:
             self.close_connections()
-            return {i: file_list[i] for i in range(0, len(file_list))}
+            return file_list
 
     def delete_playlist_file(self, filename: str):
         final_path = settings.PLAYLIST_SERVER_UPLOAD_DIRECTORY + filename

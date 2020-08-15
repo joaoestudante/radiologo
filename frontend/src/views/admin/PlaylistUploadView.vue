@@ -9,6 +9,15 @@
           <v-divider />
           <v-card-text align="center" justify="center" class="px-8">
             <div v-if="progress === '0'">
+	      <v-row class="mt-5" align="start">
+		<p class="mt-5" align="start">
+		  Envia apenas ficheiros oficiais de qualidade elevada. <br/>
+		  Ficheiros de baixa qualidade serão automaticamente rejeitados. <br/>
+		  Ficheiros de fontes públicas, como YouTube, possuem um som modificado
+		  que identifica de onde vieram e que são ilegais.
+		</p>
+	      </v-row>
+	      <v-divider />
               <v-row class="mt-5" align="start">
                 <p class="text-body-1 ml-4">
                   Artista da Música:
@@ -186,7 +195,7 @@ export default class PlaylistUploadView extends Vue {
   }
 
   get maxWidthValue() {
-    return this.$vuetify.breakpoint.smAndDown ? "90%" : "60%";
+    return this.$vuetify.breakpoint.smAndDown ? "90%" : "600px";
   }
 }
 </script>

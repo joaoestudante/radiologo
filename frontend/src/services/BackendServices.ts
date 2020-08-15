@@ -160,6 +160,14 @@ export default class BackendServices {
         return Promise.resolve();
       });
   }
+
+  static async getPlaylistContents(): Promise<any> {
+    return httpClient
+      .get("/playlist/")
+      .then(response => {
+        return response.data;
+      });
+  }
   
   static async downloadPlaylistTrack(
     url: string,
@@ -183,8 +191,8 @@ export default class BackendServices {
       });
   }
 
-  static async deletePlaylistTrack(file_name: string): Promise<any> {
-    return httpClient.delete("/playlist/track/" + file_name + "/").then(response => {
+  static async deletePlaylistTrack(filename: string): Promise<any> {
+    return httpClient.delete("/playlist/track/" + filename + "/").then(response => {
       return response;
     });
   }

@@ -49,7 +49,7 @@ class ProcessingService:
             checker = FileChecker(file_path=self.uploaded_file_path, durations=self.allowed_durations,
                                   min_sample_rate=self.min_sample_rate, min_bitrate=self.min_bitrate,
                                   recommended_bitrate=self.recommended_bitrate, info=info,
-                                  do_normalization=True)
+                                  do_normalization=True, do_check_duration=False, accept_clipping=True)
             print("\t* Checking file...")
             parameters = checker.run_checks()
 

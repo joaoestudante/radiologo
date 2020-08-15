@@ -5,7 +5,7 @@
     </v-snackbar>
     <v-col>
       <v-row align="center" justify="center">
-        <v-card class="mx-4" max-width="650px" v-if="program !== null">
+        <v-card class="mx-4" max-width="650px">
           <v-progress-linear
             v-if="downloadPercentage > 0 && downloadPercentage < 100"
             :value="downloadPercentage"
@@ -33,9 +33,10 @@
                 style="flex: 1 1 auto"
                 :headers="headers"
                 :items="files"
+		:search="search"
                 full-width
               >
-                <template v-slot:item.file_name="{ item }">
+                <template v-slot:item.actions="{ item }">
                 
                 
                 <v-tooltip bottom>
@@ -80,7 +81,7 @@ import BackendServices from "@/services/BackendServices";
 export default class PlaylistShowView extends Vue {
   headers = [
     { text: "Nome", value: "file_name", align: "left" },
-    { text: "Download", value: "file_name", align: "right" }
+    { text: "Ações", value: "actions", align: "right" }
   ];
   files = [];
   search = "";
@@ -103,21 +104,21 @@ export default class PlaylistShowView extends Vue {
     this.downloadPercentage = downloaded;
   }
 
-  downloadFile(file_name: string, file_size: number) {
+  downloadFile(filename: string, filesize: number) {
       BackendServices.downloadPlaylistTrack(
         process.env.VUE_APP_ROOT_API +
           "/playlist/track/" +
-          file_name +
+          filename +
           "/",
-        file_name,
-        file_size,
+        filename,
+        filesize,
         this.downloadProgress
       );
   }
   
-  deleteFile(file_name: string) {
+  deleteFile(filename: string) {
     if(confirm("Vai remover permanentemente o ficheiro. Prima Ok para confirmar a remoção, Cancelar se não tiver a certeza.")){
-      BackendServices.deletePlaylistTrack(file_name);
+      BackendServices.deletePlaylistTrack(filename);
     }
   }
 }
