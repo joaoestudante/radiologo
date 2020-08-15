@@ -140,7 +140,7 @@ export default class ArchiveView extends Vue {
       // called by table
       BackendServices.getArchive(
         process.env.VUE_APP_ROOT_API +
-          "programs/" +
+          "/programs/" +
           this.program.id +
           "/archive/" +
           date +
@@ -167,7 +167,7 @@ export default class ArchiveView extends Vue {
           if (this.program != null) {
             this.archiveFileUrl =
               process.env.VUE_APP_ROOT_API +
-              "programs/" +
+              "/programs/" +
               this.program.id +
               "/archive/" +
               file["file_date"] +
