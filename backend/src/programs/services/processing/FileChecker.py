@@ -13,7 +13,7 @@ class FileChecker:
     Returns a parameters string for export, or error if there are problems.
     """
 
-    def __init__(self, file_path, durations, min_sample_rate, min_bitrate, recommended_bitrate, info, do_normalization, do_check_duration):
+    def __init__(self, file_path, durations, min_sample_rate, min_bitrate, recommended_bitrate, info, do_normalization, do_check_duration, accept_clipping = False):
         self.do_normalization = do_normalization
         self.info = info
         self.recommended_bitrate = recommended_bitrate
@@ -24,6 +24,7 @@ class FileChecker:
         self.problems = []
         self.warnings = []
         self.do_check_duration = do_check_duration
+        self.accept_clipping = accept_clipping
 
     def run_checks(self):
         default_params = ["-ar", self.min_sample_rate, "-ac", '2']  # 2 = number of channels
@@ -34,6 +35,8 @@ class FileChecker:
         normalization_data = self.check_normalization_clipping()
 
         if len(self.problems) > 0:
+            print(self.problems)
+            print(self.problems[0])
             raise IrrecoverableProblemsException("There are serious problems with the file and it can't be exported.")
 
         if self.do_normalization:
@@ -103,7 +106,7 @@ class FileChecker:
             self.warnings.append(FileDynamicRange(measured_lra, 11.0))
         
         #Set true peak normalization
-        if float(normalization_data["input_tp"]) >= -0.2:
+        if (float(normalization_data["input_tp"]) > -0.2) and (not self.accept_clipping):
             self.problems.append(FileHasClipping)
 
         return normalization_data
