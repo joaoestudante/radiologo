@@ -14,12 +14,10 @@ ARG PROJECT=radiologo
 ARG PROJECT_DIR=/var/www/${PROJECT}
 RUN mkdir -p $PROJECT_DIR
 WORKDIR $PROJECT_DIR/src
-
-RUN pip install pipenv
+COPY requirements.txt $PROJECT_DIR/src/
+RUN pip install -r requirements.txt
 
 COPY . $PROJECT_DIR
-
-RUN pipenv install --deploy --ignore-pipfile
 
 EXPOSE 8000
 STOPSIGNAL SIGINT

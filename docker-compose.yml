@@ -24,7 +24,7 @@ services:
 
   celery:
     build: ./backend/
-    command: pipenv run celery -A radiologo worker --loglevel=INFO
+    command: celery -A radiologo worker --loglevel=INFO
     volumes:
       - ./backend:/var/www/radiologo
     links:
@@ -32,7 +32,7 @@ services:
 
   celery-beat:
     build: ./backend/
-    command: pipenv run celery -A radiologo beat -l debug
+    command: celery -A radiologo beat -l debug
     volumes:
       - ./backend:/var/www/radiologo
     links:
@@ -44,7 +44,7 @@ services:
     build: ./backend/
     ports:
       - "127.0.0.1:5555:5555"
-    entrypoint: pipenv run flower
+    entrypoint: flower
     command:  -A radiologo --port=5555 --broker=redis://redis:6379/0
     links:
       - redis
