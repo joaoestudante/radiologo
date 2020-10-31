@@ -21,4 +21,4 @@ COPY . $PROJECT_DIR
 
 EXPOSE 8000
 STOPSIGNAL SIGINT
-CMD pipenv run python manage.py migrate --noinput && pipenv run gunicorn -b 0.0.0.0:8000 radiologo.wsgi
+CMD python3 manage.py migrate --noinput && gunicorn -b 0.0.0.0:8000 radiologo.wsgi
